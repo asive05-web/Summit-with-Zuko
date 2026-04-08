@@ -1,1 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Summit with Zuko — Charity Auction 2026</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
 
+  <!-- ─── NAV ─── -->
+  <nav class="nav" id="nav">
+    <a href="#hero" class="nav-logo">Summit<span>with Zuko</span></a>
+    <ul class="nav-links">
+      <li><a href="#why">The Why</a></li>
+      <li><a href="#auction">Auction</a></li>
+      <li><a href="#whiskey">Whiskey</a></li>
+      <li><a href="#donate" class="nav-cta">Donate</a></li>
+    </ul>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">
+      <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+        <line x1="0" y1="1" x2="22" y2="1" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="0" y1="7" x2="22" y2="7" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="0" y1="13" x2="22" y2="13" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#why" class="mobile-link">The Why</a>
+    <a href="#auction" class="mobile-link">Auction</a>
+    <a href="#whiskey" class="mobile-link">Whiskey</a>
+    <a href="#donate" class="mobile-link">Donate</a>
+  </div>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero" id="hero">
+    <!-- VIDEO BACKGROUND -->
+    <!-- INSERT: Replace src with Everest/mountain video URL -->
+    <video class="hero-video" autoplay muted loop playsinline>
+      <source src="hero.mp4" type="video/mp4" />
+    </video> 
+
+    <!-- Placeholder mountain gradient (remove when video is added) -->
+    <div class="hero-placeholder-bg"></div>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <p class="hero-eyebrow">Everest 2026 · Charity Auction</p>
+      <h1 class="hero-title">Summit<br /><em>with Zuko</em></h1>
+      <p class="hero-tagline">Bid. Give. Summit.</p>
+      <p class="hero-sub">Fine South African art, rare whiskey, and exceptional experiences — all for a greater cause.</p>
+
+      <div class="countdown" id="countdown">
+        <div class="countdown-unit">
+          <span class="countdown-num" id="cd-days">00</span>
+          <span class="countdown-label">Days</span>
+        </div>
+        <div class="countdown-sep">·</div>
+        <div class="countdown-unit">
+          <span class="countdown-num" id="cd-hours">00</span>
+          <span class="countdown-label">Hours</span>
+        </div>
+        <div class="countdown-sep">·</div>
+        <div class="countdown-unit">
+          <span class="countdown-num" id="cd-mins">00</span>
+          <span class="countdown-label">Minutes</span>
+        </div>
+        <div class="countdown-sep">·</div>
+        <div class="countdown-unit">
+          <span class="countdown-num" id="cd-secs">00</span>
+          <span class="countdown-label">Seconds</span>
+        </div>
+      </div>
+
+      <a href="#auction" class="btn-primary">View Auction</a>
+    </div>
+
+    <div class="hero-scroll-hint">
+      <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+        <rect x="1" y="1" width="14" height="22" rx="7" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.5"/>
+        <circle class="scroll-dot" cx="8" cy="7" r="2" fill="currentColor" fill-opacity="0.6"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ─── MY WHY ─── -->
+  <section class="why" id="why">
+    <div class="section-inner why-inner">
+      <div class="why-text">
+        <p class="section-label">The Why</p>
+        <h2 class="why-heading">More than<br /><em>a mountain</em></h2>
+        <blockquote class="why-quote">
+          "Everest isn't just a mountain — it's a statement. That no dream is too big, no summit unreachable. I'm climbing for every young South African who deserves the same chance I had to believe in something greater. This expedition is personal. But the impact is for all of us."
+        </blockquote>
+        <p class="why-name">— Zuko Tisani</p>
+      </div>
+      <div class="why-image-wrap">
+        <!-- INSERT: Replace with Zuko's actual photo -->
+ <img src="zuko.png" alt="Zuko Tisani" class="why-image" />
+          </svg>
+          <p>Zuko's photo here</p>
+        </div>
+        <!-- REPLACE placeholder above with: -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── AUCTION ─── -->
+  <section class="auction" id="auction">
+    <div class="section-inner">
+      <p class="section-label">Fine Art</p>
+      <h2 class="section-heading">The Collection</h2>
+      <p class="section-sub">Exceptional works from some of South Africa's most celebrated contemporary artists. Every bid places art in your hands — and opportunity in a child's future.</p>
+
+      <div class="art-grid" id="artGrid">
+        <!-- Cards are injected by JS from ARTWORKS array in app.js -->
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading collection...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── WHISKEY ─── -->
+  <section class="whiskey" id="whiskey">
+    <div class="section-inner">
+      <p class="section-label">Exclusive</p>
+      <h2 class="section-heading">Whiskey & Cigars</h2>
+      <p class="section-sub">A curated selection of rare single malts and premium cigars for the discerning collector.</p>
+
+      <div class="whiskey-grid" id="whiskeyGrid">
+        <!-- Injected by JS from WHISKEY_ITEMS array in app.js -->
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── EDUCATION AFRICA ─── -->
+  <section class="charity" id="charity">
+    <div class="section-inner charity-inner">
+      <div class="charity-text">
+        <p class="section-label">The Cause</p>
+        <h2 class="charity-heading">Education<br /><em>Africa</em></h2>
+        <p class="charity-body">Founded in 1992, Education Africa is a Johannesburg-based NPO focused on breaking the cycle of poverty through education. For over 30 years they have been educating and empowering disadvantaged South Africans to become competitive, confident contributors to society.</p>
+        <div class="charity-tax">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          <span>All proceeds support Education Africa. Donations are tax-deductible (Section 18A).</span>
+        </div>
+      </div>
+      <div class="charity-stat-col">
+        <div class="charity-stat">
+          <span class="stat-num">30+</span>
+          <span class="stat-label">Years of impact</span>
+        </div>
+        <div class="charity-stat">
+          <span class="stat-num">1992</span>
+          <span class="stat-label">Founded</span>
+        </div>
+        <div class="charity-stat">
+          <span class="stat-num">100%</span>
+          <span class="stat-label">Proceeds to charity</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DONATE ─── -->
+  <section class="donate" id="donate">
+    <div class="section-inner donate-inner">
+      <p class="section-label">Make a difference</p>
+      <h2 class="donate-heading">Support<br /><em>the cause</em></h2>
+      <p class="donate-sub">Can't bid? A direct donation goes just as far. Every rand helps put a young South African on the path to a better future.</p>
+      <!-- INSERT: Replace href with actual PayFast / Yoco donation link -->
+      <a href="#" class="btn-primary btn-gold">Donate Now</a>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-logo">Summit <em>with Zuko</em></p>
+      <nav class="footer-nav">
+        <a href="#why">The Why</a>
+        <a href="#auction">Auction</a>
+        <a href="#charity">Education Africa</a>
+        <a href="#donate">Donate</a>
+      </nav>
+      <p class="footer-copy">&copy; 2026 Summit with Zuko. In aid of Education Africa.</p>
+    </div>
+  </footer>
+
+  <!-- ─── BID MODAL ─── -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <p class="modal-label">Place Your Bid</p>
+      <h3 class="modal-title" id="modalTitle">Artwork Title</h3>
+      <p class="modal-current">Current highest bid: <strong id="modalCurrentBid">R0</strong></p>
+      <div class="modal-form">
+        <input type="text" id="modalBidderName" class="modal-input" placeholder="Your name (optional)" />
+        <div class="modal-amount-wrap">
+          <span class="modal-currency">R</span>
+          <input type="number" id="modalBidAmount" class="modal-input modal-input-amount" placeholder="Enter bid amount" />
+        </div>
+        <p class="modal-hint" id="modalHint"></p>
+        <button class="btn-primary btn-full" id="modalSubmit">Confirm Bid</button>
+        <p class="modal-feedback" id="modalFeedback"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
