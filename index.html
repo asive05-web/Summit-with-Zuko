@@ -3,598 +3,195 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin — Summit with Zuko</title>
+  <title>Summit with Zuko — Charity Auction 2026</title>
+  <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --black:    #0a0a0a;
-      --surface:  #111111;
-      --card:     #181818;
-      --card2:    #1f1f1f;
-      --border:   rgba(255,255,255,0.07);
-      --gold:     #c9a84c;
-      --gold-lt:  #e2c47a;
-      --gold-dim: rgba(201,168,76,0.12);
-      --white:    #f5f2ec;
-      --muted:    rgba(245,242,236,0.45);
-      --green:    #6fcf97;
-      --red:      #eb5757;
-      --serif:    'Cormorant Garamond', Georgia, serif;
-      --sans:     'Outfit', system-ui, sans-serif;
-    }
-
-    html { font-size: 16px; }
-    body { background: var(--black); color: var(--white); font-family: var(--sans); font-weight: 300; line-height: 1.6; min-height: 100vh; }
-
-    /* ── LOGIN SCREEN ── */
-    #loginScreen {
-      position: fixed; inset: 0;
-      background: var(--black);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 999;
-      padding: 1.5rem;
-    }
-
-    .login-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 2.8rem 2.5rem;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .login-logo {
-      font-family: var(--serif);
-      font-size: 1.3rem;
-      font-weight: 300;
-      color: var(--white);
-      margin-bottom: 0.3rem;
-    }
-    .login-logo em { font-style: italic; color: var(--gold-lt); }
-
-    .login-sub {
-      font-size: 0.72rem;
-      font-weight: 500;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
-
-    .login-label {
-      font-size: 0.72rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.4rem;
-      display: block;
-    }
-
-    .login-input {
-      width: 100%;
-      padding: 0.85rem 1rem;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--white);
-      font-family: var(--sans);
-      font-size: 0.9rem;
-      outline: none;
-      margin-bottom: 1rem;
-      transition: border-color 0.2s;
-    }
-    .login-input:focus { border-color: var(--gold); }
-    .login-input::placeholder { color: rgba(245,242,236,0.2); }
-
-    .login-btn {
-      width: 100%;
-      padding: 0.9rem;
-      background: var(--gold);
-      border: none;
-      border-radius: 4px;
-      color: var(--black);
-      font-family: var(--sans);
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-top: 0.5rem;
-    }
-    .login-btn:hover { background: var(--gold-lt); }
-    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .login-error {
-      font-size: 0.78rem;
-      color: var(--red);
-      margin-top: 0.8rem;
-      min-height: 1em;
-      text-align: center;
-    }
-
-    /* ── ADMIN APP (hidden until logged in) ── */
-    #adminApp { display: none; }
-
-    /* ── HEADER ── */
-    .header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 1.2rem 2rem;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 10;
-    }
-
-    .header-logo { font-family: var(--serif); font-size: 1.1rem; font-weight: 300; color: var(--white); }
-    .header-logo em { font-style: italic; color: var(--gold-lt); }
-
-    .header-right { display: flex; align-items: center; gap: 1rem; }
-
-    .header-badge {
-      display: flex; align-items: center; gap: 0.5rem;
-      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--gold); background: var(--gold-dim);
-      border: 1px solid rgba(201,168,76,0.25); padding: 0.35rem 0.8rem; border-radius: 20px;
-    }
-
-    .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.3)} }
-
-    .logout-btn {
-      padding: 0.4rem 1rem;
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--muted);
-      font-family: var(--sans);
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .logout-btn:hover { border-color: var(--red); color: var(--red); }
-
-    /* ── MAIN ── */
-    .main { max-width: 1280px; margin: 0 auto; padding: 2rem; }
-
-    /* ── STATS ── */
-    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
-    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.4rem 1.6rem; }
-    .stat-card-label { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
-    .stat-card-value { font-family: var(--serif); font-size: 2rem; font-weight: 300; color: var(--gold-lt); line-height: 1; }
-
-    /* ── TABS ── */
-    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
-    .tab-btn { padding: 0.6rem 1.4rem; background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-family: var(--sans); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; margin-bottom: -1px; }
-    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
-    .tab-btn:hover { color: var(--white); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    /* ── TABLE ── */
-    .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .table-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); gap: 1rem; flex-wrap: wrap; }
-    .table-title { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-
-    .search-input { padding: 0.5rem 1rem; background: var(--card2); border: 1px solid var(--border); border-radius: 4px; color: var(--white); font-family: var(--sans); font-size: 0.82rem; outline: none; width: 220px; transition: border-color 0.2s; }
-    .search-input:focus { border-color: var(--gold); }
-    .search-input::placeholder { color: rgba(245,242,236,0.2); }
-
-    .export-btn { padding: 0.5rem 1.2rem; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3); border-radius: 4px; color: var(--gold); font-family: var(--sans); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
-    .export-btn:hover { background: rgba(201,168,76,0.25); }
-
-    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    thead tr { border-bottom: 1px solid var(--border); }
-    th { padding: 0.75rem 1.2rem; text-align: left; font-size: 0.65rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,0.02); }
-    td { padding: 0.9rem 1.2rem; color: var(--white); vertical-align: middle; }
-
-    .lot-name { font-family: var(--serif); font-size: 0.95rem; font-style: italic; color: var(--white); line-height: 1.3; }
-    .lot-type { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 0.15rem; }
-    .bid-amount { font-family: var(--serif); font-size: 1rem; color: var(--gold-lt); }
-    .bid-count { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.2); border-radius: 50%; font-size: 0.7rem; font-weight: 500; color: var(--gold); }
-    .tax-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px; font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
-    .tax-badge.yes { background: rgba(111,207,151,0.12); color: var(--green); border: 1px solid rgba(111,207,151,0.2); }
-    .tax-badge.no  { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
-    .no-bids { text-align: center; padding: 4rem 2rem; color: var(--muted); font-size: 0.85rem; }
-    .view-btn { padding: 0.35rem 0.8rem; background: none; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
-    .view-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-    /* ── DRAWER ── */
-    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-    .drawer-overlay.open { opacity: 1; pointer-events: all; }
-    .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 480px; background: var(--card); border-left: 1px solid var(--border); z-index: 51; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; padding: 2rem; }
-    .drawer.open { transform: translateX(0); }
-    .drawer-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; color: var(--muted); cursor: pointer; padding: 0.25rem; font-size: 1.2rem; transition: color 0.2s; }
-    .drawer-close:hover { color: var(--white); }
-    .drawer-label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
-    .drawer-title { font-family: var(--serif); font-size: 1.3rem; font-weight: 300; font-style: italic; color: var(--white); margin-bottom: 1.5rem; line-height: 1.3; }
-
-    .bid-history-item { background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; }
-    .bid-history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }
-    .bid-history-amount { font-family: var(--serif); font-size: 1.1rem; color: var(--gold-lt); }
-    .bid-history-time { font-size: 0.68rem; color: var(--muted); }
-    .bid-history-row { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.2rem; }
-    .bid-history-row span { color: var(--white); }
-
-    .spinner-sm { width: 20px; height: 20px; border: 1px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 2rem auto; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 768px) {
-      .main { padding: 1rem; }
-      .header { padding: 1rem 1.2rem; }
-      th, td { padding: 0.7rem 0.8rem; }
-      .search-input { width: 100%; }
-      .table-toolbar { flex-direction: column; align-items: stretch; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- ── LOGIN SCREEN ── -->
-  <div id="loginScreen">
-    <div class="login-box">
-      <p class="login-logo">Summit <em>with Zuko</em></p>
-      <p class="login-sub">Admin Access</p>
-      <label class="login-label">Email</label>
-      <input type="email" id="loginEmail" class="login-input" placeholder="your@email.com" />
-      <label class="login-label">Password</label>
-      <input type="password" id="loginPassword" class="login-input" placeholder="••••••••" />
-      <button class="login-btn" id="loginBtn">Sign In</button>
-      <p class="login-error" id="loginError"></p>
+  <!-- ─── NAV ─── -->
+  <nav class="nav" id="nav">
+    <a href="#hero" class="nav-logo">Summit<span>with Zuko</span></a>
+    <ul class="nav-links">
+      <li><a href="#why">The Why</a></li>
+      <li><a href="#auction">Auction</a></li>
+      <li><a href="#whiskey">Whiskey</a></li>
+    </ul>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">
+      <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+        <line x1="0" y1="1" x2="22" y2="1" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="0" y1="7" x2="22" y2="7" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="0" y1="13" x2="22" y2="13" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#why" class="mobile-link">The Why</a>
+    <a href="#auction" class="mobile-link">Auction</a>
+    <a href="#whiskey" class="mobile-link">Whiskey</a>
+  </div>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero" id="hero">
+    <video class="hero-video" autoplay muted loop playsinline>
+      <source src="hero.mp4" type="video/mp4" />
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Everest 2026 · Charity Auction</p>
+      <h1 class="hero-title">Summit<br /><em>with Zuko</em></h1>
+      <p class="hero-tagline">Bid. Give. Summit.</p>
+      <p class="hero-sub">Fine South African art, rare whiskey, and exceptional experiences — all for a greater cause.</p>
+      <div class="countdown" id="countdown">
+        <div class="countdown-unit"><span class="countdown-num" id="cd-days">00</span><span class="countdown-label">Days</span></div>
+        <div class="countdown-sep">·</div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-hours">00</span><span class="countdown-label">Hours</span></div>
+        <div class="countdown-sep">·</div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-mins">00</span><span class="countdown-label">Minutes</span></div>
+        <div class="countdown-sep">·</div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-secs">00</span><span class="countdown-label">Seconds</span></div>
+      </div>
+      <a href="#auction" class="btn-primary">View Auction</a>
+    </div>
+    <div class="hero-scroll-hint">
+      <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+        <rect x="1" y="1" width="14" height="22" rx="7" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.5"/>
+        <circle class="scroll-dot" cx="8" cy="7" r="2" fill="currentColor" fill-opacity="0.6"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ─── MY WHY ─── -->
+  <section class="why" id="why">
+    <div class="section-inner why-inner">
+      <div class="why-text">
+        <p class="section-label">The Why</p>
+        <h2 class="why-heading">More than<br /><em>a mountain</em></h2>
+        <blockquote class="why-quote">"Everest isn't just a mountain — it's a statement. That no dream is too big, no summit unreachable. I'm climbing for every young South African who deserves the same chance I had to believe in something greater. This expedition is personal. But the impact is for all of us."</blockquote>
+        <p class="why-name">— Zuko Tisani</p>
+      </div>
+      <div class="why-image-wrap">
+        <img src="zuko.png" alt="Zuko Tisani" class="why-image" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── AUCTION ─── -->
+  <section class="auction" id="auction">
+    <div class="section-inner">
+      <p class="section-label">Fine Art</p>
+      <h2 class="section-heading">The Collection</h2>
+      <p class="section-sub">Exceptional works from some of South Africa's most celebrated contemporary artists. Every bid places art in your hands — and opportunity in a child's future.</p>
+      <div class="art-grid" id="artGrid">
+        <div class="loading-state"><div class="spinner"></div><p>Loading collection...</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── WHISKEY ─── -->
+  <section class="whiskey" id="whiskey">
+    <div class="section-inner">
+      <p class="section-label">Exclusive</p>
+      <h2 class="section-heading">Whiskey & Cigars</h2>
+      <p class="section-sub">A curated selection of rare single malts and premium cigars for the discerning collector.</p>
+      <div class="whiskey-grid" id="whiskeyGrid">
+        <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── EDUCATION AFRICA ─── -->
+  <section class="charity" id="charity">
+    <div class="section-inner charity-inner">
+      <div class="charity-text">
+        <p class="section-label">The Cause</p>
+        <h2 class="charity-heading">Education<br /><em>Africa</em></h2>
+        <p class="charity-body">Founded in 1992, Education Africa is a Johannesburg-based NPO focused on breaking the cycle of poverty through education. For over 30 years they have been educating and empowering disadvantaged South Africans to become competitive, confident contributors to society.</p>
+        <div class="charity-tax">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          <span>All proceeds support Education Africa. Donations are tax-deductible (Section 18A).</span>
+        </div>
+      </div>
+      <div class="charity-stat-col">
+        <div class="charity-stat"><span class="stat-num">30+</span><span class="stat-label">Years of impact</span></div>
+        <div class="charity-stat"><span class="stat-num">1992</span><span class="stat-label">Founded</span></div>
+        <div class="charity-stat"><span class="stat-num">100%</span><span class="stat-label">Proceeds to charity</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-logo">Summit <em>with Zuko</em></p>
+      <nav class="footer-nav">
+        <a href="#why">The Why</a>
+        <a href="#auction">Auction</a>
+        <a href="#whiskey">Whiskey</a>
+        <a href="#charity">Education Africa</a>
+      </nav>
+      <p class="footer-copy">&copy; 2026 Summit with Zuko. In aid of Education Africa.</p>
+    </div>
+  </footer>
+
+  <!-- ─── BACK TO TOP ─── -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"/>
+    </svg>
+  </button>
+
+  <!-- ─── BID MODAL ─── -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <p class="modal-label">Place Your Bid</p>
+      <h3 class="modal-title" id="modalTitle">Item Title</h3>
+      <p class="modal-current">Current highest bid: <strong id="modalCurrentBid">R0</strong></p>
+      <div class="modal-form">
+        <div class="modal-amount-wrap">
+          <span class="modal-currency">R</span>
+          <input type="number" id="modalBidAmount" class="modal-input modal-input-amount" placeholder="Enter bid amount" />
+        </div>
+        <p class="modal-hint" id="modalHint"></p>
+        <div class="modal-tax-toggle">
+          <p class="modal-toggle-label">Would you like a Section 18A tax certificate?</p>
+          <div class="modal-toggle-btns">
+            <button type="button" class="modal-toggle-btn active" id="taxYes">Yes please</button>
+            <button type="button" class="modal-toggle-btn" id="taxNo">No thanks</button>
+          </div>
+        </div>
+        <div id="taxFields">
+          <input type="text"  id="modalFullName" class="modal-input" placeholder="Full name & surname *" />
+          <input type="text"  id="modalIdNumber" class="modal-input" placeholder="ID or passport number *" />
+          <input type="text"  id="modalTaxRef"   class="modal-input" placeholder="Tax reference number (SARS) *" />
+          <input type="tel"   id="modalPhone"    class="modal-input" placeholder="Contact number *" />
+          <input type="email" id="modalEmail"    class="modal-input" placeholder="Email address *" />
+          <input type="text"  id="modalAddress"  class="modal-input" placeholder="Residential address *" />
+        </div>
+        <div id="noTaxFields" style="display:none;">
+          <input type="text"  id="modalFullNameBasic" class="modal-input" placeholder="Full name *" />
+          <input type="tel"   id="modalPhoneBasic"    class="modal-input" placeholder="Contact number *" />
+          <input type="email" id="modalEmailBasic"    class="modal-input" placeholder="Email address *" />
+          <input type="text"  id="modalAddressBasic"  class="modal-input" placeholder="Address *" />
+        </div>
+        <button class="btn-primary btn-full" id="modalSubmit">Confirm Bid</button>
+        <p class="modal-feedback" id="modalFeedback"></p>
+      </div>
     </div>
   </div>
 
-  <!-- ── ADMIN APP ── -->
-  <div id="adminApp">
-
-    <header class="header">
-      <div class="header-logo">Summit <em>with Zuko</em> — Admin</div>
-      <div class="header-right">
-        <div class="header-badge"><span class="live-dot"></span> Live</div>
-        <button class="logout-btn" id="logoutBtn">Sign Out</button>
-      </div>
-    </header>
-
-    <main class="main">
-
-      <div class="stats-row">
-        <div class="stat-card"><p class="stat-card-label">Total Raised</p><p class="stat-card-value" id="statTotal">—</p></div>
-        <div class="stat-card"><p class="stat-card-label">Active Lots</p><p class="stat-card-value" id="statLots">—</p></div>
-        <div class="stat-card"><p class="stat-card-label">Total Bids Placed</p><p class="stat-card-value" id="statBids">—</p></div>
-        <div class="stat-card"><p class="stat-card-label">Highest Single Bid</p><p class="stat-card-value" id="statHighest">—</p></div>
-      </div>
-
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="all">All Lots</button>
-        <button class="tab-btn" data-tab="art">Fine Art</button>
-        <button class="tab-btn" data-tab="whiskey">Whiskey</button>
-        <button class="tab-btn" data-tab="nobids">No Bids Yet</button>
-      </div>
-
-      <div class="tab-panel active" id="tab-all">
-        <div class="table-wrap">
-          <div class="table-toolbar">
-            <span class="table-title">All Lots</span>
-            <input type="text" class="search-input" id="searchAll" placeholder="Search lot or bidder..." />
-            <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
-          </div>
-          <table><thead><tr><th>Lot</th><th>Current Bid</th><th>Last Bidder</th><th>Bids</th><th>Tax Cert</th><th>Last Activity</th><th></th></tr></thead><tbody id="tableAll"></tbody></table>
-        </div>
-      </div>
-
-      <div class="tab-panel" id="tab-art">
-        <div class="table-wrap">
-          <div class="table-toolbar"><span class="table-title">Fine Art</span></div>
-          <table><thead><tr><th>Lot</th><th>Current Bid</th><th>Last Bidder</th><th>Bids</th><th>Tax Cert</th><th>Last Activity</th><th></th></tr></thead><tbody id="tableArt"></tbody></table>
-        </div>
-      </div>
-
-      <div class="tab-panel" id="tab-whiskey">
-        <div class="table-wrap">
-          <div class="table-toolbar"><span class="table-title">Whiskey & Cigars</span></div>
-          <table><thead><tr><th>Lot</th><th>Current Bid</th><th>Last Bidder</th><th>Bids</th><th>Tax Cert</th><th>Last Activity</th><th></th></tr></thead><tbody id="tableWhiskey"></tbody></table>
-        </div>
-      </div>
-
-      <div class="tab-panel" id="tab-nobids">
-        <div class="table-wrap">
-          <div class="table-toolbar"><span class="table-title">Lots with no bids yet</span></div>
-          <table><thead><tr><th>Lot</th><th>Type</th><th>Starting Bid</th></tr></thead><tbody id="tableNoBids"></tbody></table>
-        </div>
-      </div>
-
-    </main>
-  </div>
-
-  <!-- ── DRAWER ── -->
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-  <div class="drawer" id="drawer">
-    <button class="drawer-close" id="drawerClose">✕</button>
-    <p class="drawer-label">Bid History</p>
-    <h2 class="drawer-title" id="drawerTitle">—</h2>
-    <div id="drawerContent"><div class="spinner-sm"></div></div>
-  </div>
-
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey:            "AIzaSyBEQtDq8nmnjVQ_jE_s1JZrEE0QHEX3n8Q",
-      authDomain:        "summit-with-zuko.firebaseapp.com",
-      databaseURL:       "https://summit-with-zuko-default-rtdb.firebaseio.com",
-      projectId:         "summit-with-zuko",
-      storageBucket:     "summit-with-zuko.firebasestorage.app",
-      messagingSenderId: "992070995112",
-      appId:             "1:992070995112:web:02da0153febce3e554469d"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db   = firebase.database();
-
-    /* ── AUTH STATE ── */
-auth.onAuthStateChanged(user => {
-  if (user) {
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("adminApp").style.display = "block";
-    startListening();
-  } else {
-    document.getElementById("loginScreen").style.display = "flex";
-    document.getElementById("adminApp").style.display = "none";
-    // Reset login form on sign out
-    const btn = document.getElementById("loginBtn");
-    btn.textContent = "Sign In";
-    btn.disabled = false;
-    document.getElementById("loginEmail").value = "";
-    document.getElementById("loginPassword").value = "";
-    document.getElementById("loginError").textContent = "";
-  }
-});
-
-    /* ── LOGIN ── */
-    document.getElementById("loginBtn").addEventListener("click", async () => {
-      const email    = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value;
-      const errEl    = document.getElementById("loginError");
-      const btn      = document.getElementById("loginBtn");
-
-      if (!email || !password) { errEl.textContent = "Please enter your email and password."; return; }
-
-      btn.textContent = "Signing in...";
-      btn.disabled = true;
-      errEl.textContent = "";
-
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-      } catch (err) {
-        btn.textContent = "Sign In";
-        btn.disabled = false;
-        errEl.textContent = "Incorrect email or password. Please try again.";
-      }
-    });
-
-    // Allow pressing Enter to submit
-    document.getElementById("loginPassword").addEventListener("keydown", e => {
-      if (e.key === "Enter") document.getElementById("loginBtn").click();
-    });
-
-    /* ── LOGOUT ── */
-    document.getElementById("logoutBtn").addEventListener("click", () => auth.signOut());
-
-    /* ── DATA ── */
-    const LOTS = [
-      { id: "benon-lutaaya-self-reflection", title: "Self Reflection, 2017", type: "art" },
-      { id: "sarah-grace-meadow-love", title: "Meadow Love, 2022", type: "art" },
-      { id: "blessing-ngobeni-blackdoor", title: "Blackdoor, 2016", type: "art" },
-      { id: "blessing-ngobeni-middle-finger", title: "Middle Finger, Nose, 2015", type: "art" },
-      { id: "themba-khumalo-ukushona", title: "Ukushona Kwelanga, 2022", type: "art" },
-      { id: "nelson-makamo-portrait-blue", title: "Portrait Blue & Yellow, 2015", type: "art" },
-      { id: "restone-maambo-woman-afro", title: "The Woman with an Afro, 2025", type: "art" },
-      { id: "solomon-omogboye-fragile", title: "Fragile and Precious, 2024", type: "art" },
-      { id: "solomon-omogboye-nest-3", title: "Nest 3, 2024", type: "art" },
-      { id: "solomon-omogboye-home-is-you", title: "Home Is You, 2024", type: "art" },
-      { id: "sarah-grace-romeo-juliette", title: "Romeo & Juliette #1, 2024", type: "art" },
-      { id: "john-vusi-mfupi-four-four", title: "Four-Four Mashinilatsane 3, 2018", type: "art" },
-      { id: "john-vusi-mfupi-fisherman-2", title: "Fisherman 2, 2023", type: "art" },
-      { id: "fumani-walter-maluleke-hekani", title: "I Hekani (During the Day 4), 2023", type: "art" },
-      { id: "sarah-grace-rococo-dream", title: "Rococo Dream, 2023", type: "art" },
-      { id: "john-vusi-mfupi-floods-2", title: "Floods 2, 2023", type: "art" },
-      { id: "themba-khumalo-umilo-2", title: "Umilo 2, 2025", type: "art" },
-      { id: "colbert-mashile-the-gate", title: "The Gate, 2026", type: "art" },
-      { id: "norman-catherine-17021", title: "17021, 2017", type: "art" },
-      { id: "norman-catherine-joy-ride", title: "Joy Ride, 30/45, 2002", type: "art" },
-      { id: "whiskey-rosebank-31", title: "Rosebank 31 Year Old – Release Two", type: "whiskey" },
-      { id: "whiskey-rosebank-32", title: "Rosebank 32 Year Old – Release Three", type: "whiskey" },
-      { id: "whiskey-glenfarclas-1988", title: "Glenfarclas 1988 Family Cask", type: "whiskey" },
-      { id: "whiskey-glendronach-28-1994", title: "GlenDronach 28 Year 1994", type: "whiskey" },
-      { id: "whiskey-glendronach-30-1992", title: "GlenDronach 30 Year Old 1992", type: "whiskey" },
-      { id: "whiskey-glendronach-31-1991", title: "GlenDronach 31 Year Old 1991", type: "whiskey" },
-      { id: "whiskey-bunnahabhain-30", title: "Bunnahabhain 30 Year Old", type: "whiskey" },
-      { id: "whiskey-ardbeg-25", title: "Ardbeg 25 Year Old", type: "whiskey" },
-      { id: "whiskey-laphroaig-34-book4", title: "Laphroaig 34 Year Old Book 4", type: "whiskey" },
-      { id: "whiskey-laphroaig-34-book5", title: "Laphroaig 34 Year Old Book 5", type: "whiskey" },
-      { id: "whiskey-eagle-rare-20", title: "Eagle Rare Double Eagle 20 Year Old", type: "whiskey" },
-      { id: "whiskey-macallan-30-double-cask", title: "Macallan 30 Year Old Double Cask", type: "whiskey" },
-      { id: "whiskey-talisker-25", title: "Talisker 25 Year Old", type: "whiskey" },
-      { id: "whiskey-jj-corry-flintlock-21", title: "JJ Corry Flintlock 21 Year Old", type: "whiskey" },
-      { id: "whiskey-redbreast-27-ruby", title: "Redbreast 27 Year Ruby Cask Finish", type: "whiskey" },
-      { id: "whiskey-redbreast-21", title: "Redbreast 21 Year Old", type: "whiskey" },
-      { id: "whiskey-glenmorangie-25-altus", title: "Glenmorangie 25 Year Old – The Altus", type: "whiskey" },
-      { id: "whiskey-benriach-22", title: "Benriach 22 Year Old Triple Distilled", type: "whiskey" },
-      { id: "whiskey-benriach-25", title: "Benriach 25 Year Old Triple Distilled 2024", type: "whiskey" },
-      { id: "whiskey-benriach-30-rachel-barrie", title: "Benriach The Thirty – Rachel Barrie", type: "whiskey" },
-      { id: "whiskey-macallan-harmony-jing", title: "Macallan Harmony Collection – Jing", type: "whiskey" },
-      { id: "whiskey-macallan-harmony-arabica", title: "Macallan Harmony – Intense Arabica", type: "whiskey" },
-      { id: "whiskey-macallan-harmony-amber-meadow", title: "Macallan Harmony – Amber Meadow", type: "whiskey" },
-      { id: "whiskey-dunvilles-px-20", title: "Dunville's PX Very Rare 20 Year Old", type: "whiskey" },
-      { id: "whiskey-balvenie-tun-1509-batch8", title: "Balvenie Tun 1509 – Batch 8", type: "whiskey" }
-    ];
-
-    const allData = {};
-    let totalBids = 0;
-    let dbListener = null;
-
-    function formatZAR(n) { return "R " + Number(n).toLocaleString("en-ZA"); }
-
-    function formatTime(ts) {
-      if (!ts) return "—";
-      const d = new Date(ts);
-      return d.toLocaleDateString("en-ZA", { day: "numeric", month: "short" }) + " " +
-             d.toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" });
-    }
-
-    function buildRow(item, data) {
-      const hasBid = data && data.currentBid;
-      const taxWanted = data?.lastBidderInfo?.wantsTaxCertificate;
-      return `<tr>
-        <td><div class="lot-name">${item.title}</div><div class="lot-type">${item.type === "art" ? "Fine Art" : "Whiskey"}</div></td>
-        <td><span class="bid-amount">${hasBid ? formatZAR(data.currentBid) : "—"}</span></td>
-        <td>${data?.lastBidder || "—"}</td>
-        <td>${hasBid ? `<span class="bid-count">${data.bidCount || 1}</span>` : "—"}</td>
-        <td>${hasBid ? `<span class="tax-badge ${taxWanted ? 'yes' : 'no'}">${taxWanted ? 'Yes' : 'No'}</span>` : "—"}</td>
-        <td style="font-size:0.75rem;color:var(--muted)">${formatTime(data?.updatedAt)}</td>
-        <td>${hasBid ? `<button class="view-btn" onclick="openDrawer('${item.id}','${item.title.replace(/'/g,"\\'")}')">View</button>` : ""}</td>
-      </tr>`;
-    }
-
-    function renderTables(filter = "") {
-      const lower = filter.toLowerCase();
-      const filtered = LOTS.filter(i => {
-        if (!lower) return true;
-        const d = allData[i.id];
-        return i.title.toLowerCase().includes(lower) || (d?.lastBidder || "").toLowerCase().includes(lower);
-      });
-
-      document.getElementById("tableAll").innerHTML =
-        filtered.map(i => buildRow(i, allData[i.id])).join("") ||
-        `<tr><td colspan="7" class="no-bids">No lots found</td></tr>`;
-
-      document.getElementById("tableArt").innerHTML =
-        LOTS.filter(i => i.type === "art").map(i => buildRow(i, allData[i.id])).join("") ||
-        `<tr><td colspan="7" class="no-bids">No art lots</td></tr>`;
-
-      document.getElementById("tableWhiskey").innerHTML =
-        LOTS.filter(i => i.type === "whiskey").map(i => buildRow(i, allData[i.id])).join("") ||
-        `<tr><td colspan="7" class="no-bids">No whiskey lots</td></tr>`;
-
-      document.getElementById("tableNoBids").innerHTML =
-        LOTS.filter(i => !allData[i.id]?.currentBid)
-          .map(i => `<tr><td><div class="lot-name">${i.title}</div></td><td><div class="lot-type">${i.type === "art" ? "Fine Art" : "Whiskey"}</div></td><td style="color:var(--muted);font-size:0.82rem;">No bids yet</td></tr>`)
-          .join("") || `<tr><td colspan="3" class="no-bids">🎉 All lots have bids!</td></tr>`;
-
-      const activeLots = LOTS.filter(i => allData[i.id]?.currentBid).length;
-      const total      = LOTS.reduce((s, i) => s + (allData[i.id]?.currentBid || 0), 0);
-      const highest    = Math.max(0, ...LOTS.map(i => allData[i.id]?.currentBid || 0));
-      document.getElementById("statTotal").textContent   = total > 0 ? formatZAR(total) : "R 0";
-      document.getElementById("statLots").textContent    = activeLots;
-      document.getElementById("statBids").textContent    = totalBids;
-      document.getElementById("statHighest").textContent = highest > 0 ? formatZAR(highest) : "—";
-    }
-
-    function startListening() {
-      if (dbListener) db.ref("bids").off("value", dbListener);
-      dbListener = db.ref("bids").on("value", snapshot => {
-        const bidsData = snapshot.val() || {};
-        totalBids = 0;
-        LOTS.forEach(item => {
-          const bid = bidsData[item.id];
-          if (bid) {
-            const historyCount = bid.history ? Object.keys(bid.history).length : 1;
-            totalBids += historyCount;
-            let lastBidderInfo = {};
-            if (bid.history) {
-              const entries = Object.values(bid.history).sort((a, b) => b.timestamp - a.timestamp);
-              lastBidderInfo = entries[0] || {};
-            }
-            allData[item.id] = { currentBid: bid.currentBid, lastBidder: bid.lastBidder, updatedAt: bid.updatedAt, bidCount: historyCount, lastBidderInfo };
-          } else {
-            delete allData[item.id];
-          }
-        });
-        renderTables(document.getElementById("searchAll")?.value || "");
-      });
-    }
-
-    /* ── SEARCH ── */
-    document.getElementById("searchAll").addEventListener("input", e => renderTables(e.target.value));
-
-    /* ── TABS ── */
-    document.querySelectorAll(".tab-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-        btn.classList.add("active");
-        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
-      });
-    });
-
-    /* ── DRAWER ── */
-    function openDrawer(itemId, title) {
-      document.getElementById("drawerTitle").textContent = title;
-      document.getElementById("drawerContent").innerHTML = '<div class="spinner-sm"></div>';
-      document.getElementById("drawerOverlay").classList.add("open");
-      document.getElementById("drawer").classList.add("open");
-      db.ref("bids/" + itemId + "/history").get().then(snap => {
-        const history = snap.val();
-        if (!history) { document.getElementById("drawerContent").innerHTML = '<p style="color:var(--muted);font-size:0.82rem;">No bid history found.</p>'; return; }
-        const entries = Object.values(history).sort((a, b) => b.timestamp - a.timestamp);
-        document.getElementById("drawerContent").innerHTML = entries.map(e => `
-          <div class="bid-history-item">
-            <div class="bid-history-header">
-              <span class="bid-history-amount">${formatZAR(e.amount)}</span>
-              <span class="bid-history-time">${formatTime(e.timestamp)}</span>
-            </div>
-            <div class="bid-history-row">Name: <span>${e.fullName || "—"}</span></div>
-            <div class="bid-history-row">Contact: <span>${e.phone || "—"}</span></div>
-            <div class="bid-history-row">Email: <span>${e.email || "—"}</span></div>
-            <div class="bid-history-row">Address: <span>${e.address || "—"}</span></div>
-            ${e.wantsTaxCertificate ? `
-            <div class="bid-history-row">ID/Passport: <span>${e.idNumber || "—"}</span></div>
-            <div class="bid-history-row">Tax Ref: <span>${e.taxRef || "—"}</span></div>` : ""}
-            <div style="margin-top:0.5rem">
-              <span class="tax-badge ${e.wantsTaxCertificate ? 'yes' : 'no'}">${e.wantsTaxCertificate ? 'Wants tax certificate' : 'No tax certificate'}</span>
-            </div>
-          </div>`).join("");
-      });
-    }
-
-    function closeDrawer() {
-      document.getElementById("drawerOverlay").classList.remove("open");
-      document.getElementById("drawer").classList.remove("open");
-    }
-
-    document.getElementById("drawerClose").addEventListener("click", closeDrawer);
-    document.getElementById("drawerOverlay").addEventListener("click", closeDrawer);
-
-    /* ── EXPORT CSV ── */
-    function exportCSV() {
-      const rows = [["Lot","Type","Current Bid","Last Bidder","Phone","Email","Address","ID/Passport","Tax Ref","Wants Tax Cert","Bid Count","Last Activity"]];
-      LOTS.forEach(item => {
-        const d = allData[item.id];
-        if (d) {
-          const info = d.lastBidderInfo || {};
-          rows.push([`"${item.title}"`, item.type === "art" ? "Fine Art" : "Whiskey", d.currentBid || 0, `"${d.lastBidder || ""}"`, `"${info.phone || ""}"`, `"${info.email || ""}"`, `"${info.address || ""}"`, `"${info.idNumber || ""}"`, `"${info.taxRef || ""}"`, info.wantsTaxCertificate ? "Yes" : "No", d.bidCount || 0, `"${formatTime(d.updatedAt)}"`]);
-        }
-      });
-      const csv  = rows.map(r => r.join(",")).join("\n");
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement("a");
-      a.href = url; a.download = "summit-with-zuko-bids.csv"; a.click();
-      URL.revokeObjectURL(url);
-    }
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
