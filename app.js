@@ -318,3 +318,24 @@ setInterval(updateCountdown, 1000);
 
 renderArtGrid();
 renderWhiskeyGrid();
+
+/* ─── PAGE LOADER ─── */
+(function () {
+  const loader = document.getElementById("pageLoader");
+  if (!loader) return;
+
+  function dismiss() {
+    loader.classList.add("hidden");
+  }
+
+  const video = document.querySelector(".hero-video");
+  if (video) {
+    // Dismiss on first playable frame
+    video.addEventListener("canplay", dismiss, { once: true });
+    // Fallback: dismiss after 4 s no matter what
+    setTimeout(dismiss, 4000);
+  } else {
+    // No video — dismiss after short delay
+    setTimeout(dismiss, 800);
+  }
+})();
