@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 
 admin.initializeApp();
 
-exports.yocoCharge = functions.runWith({ secrets: ["YOCO_SECRET_KEY"] }).https.onRequest(async (req, res) => {
+exports.yocoCharge = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -27,11 +27,13 @@ exports.yocoCharge = functions.runWith({ secrets: ["YOCO_SECRET_KEY"] }).https.o
   }
 
   try {
+const secret = process.env.YOCO_SECRET_KEY;
+
     const response = await fetch("https://payments.yoco.com/api/checkouts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.YOCO_SECRET_KEY}`
+        "Authorization": `Bearer ${secret}`
       },
       body: JSON.stringify({
         amount: amountInCents,
