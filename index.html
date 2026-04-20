@@ -4,13 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Summit with Zuko · Everest 2026</title>
-  <!-- React + ReactDOM + Babel -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Yoco Payment SDK -->
-  <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
-  <!-- Summit with Zuko brand fonts: Cormorant Garamond + Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -26,299 +22,165 @@
   <script type="text/babel" data-presets="react">
     const { useState, useEffect } = React;
 
-    /* ── BRAND TOKENS (Summit with Zuko palette) ── */
-    const GOLD   = "#C8A96E";   /* primary accent – champagne gold */
-    const GOLD2  = "#E8C98E";   /* hover highlight */
-    const BG     = "#080808";
-    const CARD   = "#0F0F0F";
-    const BR     = "#1E1E1E";
-    const MUTED  = "#5A5A5A";
-    const DIM    = "#3A3A3A";
+    const GOLD  = "#C8A96E";
+    const GOLD2 = "#E8C98E";
+    const BG    = "#080808";
+    const CARD  = "#0F0F0F";
+    const BR    = "#1E1E1E";
+    const MUTED = "#5A5A5A";
+    const DIM   = "#3A3A3A";
 
-    /* ── MOUNTAIN SVG (unchanged logic, updated accent colour) ── */
-    function Mountain({ blink }) {
+    const CHARGE_URL = "https://yococharge-hzj7232i5a-uc.a.run.app";
+
+    function MountainTracker({ blink }) {
+      const routePoints = [
+        { x: 49.5, y: 10,  label: "SUMMIT · 8,849 M",  type: "summit" },
+        { x: 51,   y: 28,  label: "CAMP IV · 7,950 M", type: "camp"   },
+        { x: 53,   y: 44,  label: "CAMP III · 7,162 M",type: "live"   },
+        { x: 55,   y: 60,  label: "CAMP II · 6,500 M", type: "camp"   },
+        { x: 57,   y: 76,  label: "BASE CAMP · 5,364 M",type:"base"   },
+      ];
+      const svgStyle = { position:"absolute", inset:0, width:"100%", height:"100%", overflow:"visible" };
       return (
-        <svg viewBox="0 0 800 480" xmlns="http://www.w3.org/2000/svg" style={{ display:"block", width:"100%", height:"auto" }}>
-          <defs>
-            <linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#06131D"/>
-              <stop offset="45%"  stopColor="#0C2335"/>
-              <stop offset="100%" stopColor="#112D3C"/>
-            </linearGradient>
-            <linearGradient id="gFar" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#163248"/>
-              <stop offset="100%" stopColor="#0A1B27"/>
-            </linearGradient>
-            <linearGradient id="gMtn" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#193244"/>
-              <stop offset="38%"  stopColor="#0D1E2E"/>
-              <stop offset="100%" stopColor="#050B10"/>
-            </linearGradient>
-            <linearGradient id="gSnow" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#EDF3F7"/>
-              <stop offset="100%" stopColor="#BAD0DA" stopOpacity="0.8"/>
-            </linearGradient>
-            <linearGradient id="gHaze" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#080808" stopOpacity="0"/>
-              <stop offset="100%" stopColor="#080808" stopOpacity="0.6"/>
-            </linearGradient>
-          </defs>
-          <rect width="800" height="480" fill="url(#gSky)"/>
-          <ellipse cx="405" cy="380" rx="350" ry="80"  fill="#0E2F42" opacity="0.35"/>
-          <ellipse cx="405" cy="400" rx="260" ry="55"  fill="#142840" opacity="0.25"/>
-          <ellipse cx="85"  cy="195" rx="105" ry="30"  fill="#0D1F2F" opacity="0.85"/>
-          <ellipse cx="140" cy="210" rx="82"  ry="24"  fill="#0B1C2C" opacity="0.75"/>
-          <ellipse cx="50"  cy="215" rx="58"  ry="19"  fill="#0A1826" opacity="0.65"/>
-          <ellipse cx="715" cy="218" rx="95"  ry="28"  fill="#0D1F2F" opacity="0.8"/>
-          <ellipse cx="660" cy="232" rx="78"  ry="22"  fill="#0B1C2C" opacity="0.7"/>
-          <polygon
-            points="0,420 55,305 110,355 160,265 210,305 255,225 295,270 325,205 355,235 380,168 402,130 420,162 445,228 475,200 510,245 548,205 580,255 618,225 655,275 695,245 738,295 775,265 800,305 800,480 0,480"
-            fill="url(#gFar)" opacity="0.9"/>
-          <polygon
-            points="0,480 65,438 125,455 178,378 228,408 272,325 308,355 340,278 360,242 382,196 405,52 428,190 450,240 475,262 510,295 544,270 575,308 614,285 650,335 688,312 728,360 768,338 800,375 800,480"
-            fill="url(#gMtn)"/>
-          <line x1="405" y1="52" x2="368" y2="245" stroke="#1D3A52" strokeWidth="1.2" opacity="0.4"/>
-          <line x1="405" y1="52" x2="443" y2="245" stroke="#1D3A52" strokeWidth="1.2" opacity="0.4"/>
-          <polygon points="385,148 405,52 426,146 416,132 405,65 394,130" fill="url(#gSnow)" opacity="0.96"/>
-          <polygon points="390,185 405,148 426,182 416,192 405,158 395,188" fill="#C4D8E0" opacity="0.52"/>
-          <polygon points="343,270 357,245 369,265 360,275" fill="#B6CBCC" opacity="0.28"/>
-          <polygon points="440,256 458,235 472,258 462,265" fill="#B6CBCC" opacity="0.28"/>
-          <path
-            d="M 472,468 C 466,440 458,420 452,396 C 446,372 440,350 436,322 C 431,296 426,272 420,248 C 416,228 411,210 407,194"
-            stroke="rgba(255,255,255,0.78)" strokeWidth="2" fill="none"
-            strokeDasharray="8,5" strokeLinecap="round"/>
-          <circle cx="472" cy="468" r="5" fill="white" opacity="0.85"/>
-          <text x="484" y="472" fill="rgba(255,255,255,0.5)" fontSize="9" fontFamily="monospace">BASE</text>
-          <circle cx="452" cy="396" r="4" fill="white" opacity="0.72"/>
-          <circle cx="434" cy="320" r="4" fill="white" opacity="0.72"/>
-          {blink && <circle cx="407" cy="194" r="20" fill={GOLD} opacity="0.1"/>}
-          {blink && <circle cx="407" cy="194" r="12" fill={GOLD} opacity="0.22"/>}
-          <circle cx="407" cy="194" r="6" fill={GOLD}/>
-          <circle cx="407" cy="194" r="6" fill="none" stroke="white" strokeWidth="1.5" opacity="0.55"/>
-          <rect x="292" y="179" width="107" height="22" rx="3" fill="#060606" opacity="0.93"/>
-          <rect x="292" y="179" width="107" height="22" rx="3" fill="none" stroke={GOLD} strokeWidth="0.9" opacity="0.65"/>
-          <text x="345" y="194" textAnchor="middle" fill="white" fontSize="9.5" fontWeight="bold"
-            letterSpacing="0.8" fontFamily="'Courier New', monospace">CAMP III · 7,182 M</text>
-          <rect x="0" y="400" width="800" height="80" fill="url(#gHaze)"/>
-          <circle cx="22" cy="17" r="5"  fill={GOLD} opacity={blink ? 1 : 0.4}/>
-          <circle cx="22" cy="17" r="9"  fill={GOLD} opacity={blink ? 0.15 : 0}/>
-          <text x="33" y="21" fill={GOLD} fontSize="10" fontWeight="700" letterSpacing="2" fontFamily="'Courier New', monospace">
-            LIVE · TRACKING
-          </text>
-          <text x="793" y="18" textAnchor="end" fill="#444" fontSize="9" fontFamily="monospace" letterSpacing="0.5">
-            27°59'37"N · 86°55'31"E
-          </text>
-        </svg>
+        <div style={{ position:"relative", width:"100%", aspectRatio:"16/9", overflow:"hidden", borderRadius:4 }}>
+          <img src="mountain.jpg" alt="Mount Everest at golden hour" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 30%", display:"block" }}/>
+          <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 30%, transparent 55%, rgba(0,0,0,0.75) 100%)", pointerEvents:"none" }}/>
+          <svg style={svgStyle} viewBox="0 0 100 100" preserveAspectRatio="none">
+            <polyline points={routePoints.map(p=>`${p.x},${p.y}`).join(" ")} fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="0.35" strokeDasharray="1.2,0.8" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>
+          </svg>
+          {routePoints.map((pt, i) => {
+            const isLive = pt.type === "live";
+            const isSummit = pt.type === "summit";
+            return (
+              <div key={i} style={{ position:"absolute", left:`${pt.x}%`, top:`${pt.y}%`, transform:"translate(-50%,-50%)", zIndex: isLive ? 10 : 5 }}>
+                {isLive && blink && (<>
+                  <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:40, height:40, borderRadius:"50%", background:GOLD, opacity:0.12 }}/>
+                  <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:24, height:24, borderRadius:"50%", background:GOLD, opacity:0.22 }}/>
+                </>)}
+                <div style={{ width: isLive?12:isSummit?8:7, height: isLive?12:isSummit?8:7, borderRadius:"50%", background: isLive?GOLD:isSummit?"#fff":"rgba(255,255,255,0.6)", border: isLive?`2px solid rgba(255,255,255,0.8)`:`1.5px solid rgba(255,255,255,0.5)`, position:"relative", zIndex:2, boxShadow: isLive?`0 0 12px ${GOLD}80`:"none" }}/>
+                <div style={{ position:"absolute", left: i%2===0?"calc(100% + 10px)":"auto", right: i%2!==0?"calc(100% + 10px)":"auto", top:"50%", transform:"translateY(-50%)", whiteSpace:"nowrap", background: isLive?"rgba(0,0,0,0.85)":"rgba(0,0,0,0.55)", border: isLive?`1px solid ${GOLD}99`:"1px solid rgba(255,255,255,0.15)", borderRadius:3, padding: isLive?"4px 10px":"3px 8px", fontSize: isLive?10:9, fontWeight: isLive?700:500, letterSpacing:1.5, color: isLive?"#fff":"rgba(255,255,255,0.65)", fontFamily:"'Courier New', monospace" }}>
+                  {isLive && <span style={{ color:GOLD, marginRight:5 }}>●</span>}
+                  {pt.label}
+                </div>
+              </div>
+            );
+          })}
+          <div style={{ position:"absolute", top:16, left:16, display:"flex", alignItems:"center", gap:8, background:"rgba(0,0,0,0.7)", border:`1px solid rgba(255,255,255,0.12)`, borderRadius:20, padding:"6px 14px" }}>
+            <div style={{ width:8, height:8, borderRadius:"50%", background: blink?GOLD:`${GOLD}55`, boxShadow: blink?`0 0 8px ${GOLD}`:"none", transition:"all 0.3s" }}/>
+            <span style={{ fontSize:10, fontWeight:700, letterSpacing:2.5, color:"rgba(255,255,255,0.85)", fontFamily:"'Courier New', monospace" }}>LIVE · TRACKING</span>
+          </div>
+          <div style={{ position:"absolute", top:16, right:16, background:"rgba(0,0,0,0.6)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:3, padding:"5px 12px" }}>
+            <div style={{ fontSize:8, color:"rgba(255,255,255,0.4)", letterSpacing:2, fontFamily:"monospace", marginBottom:2 }}>COORDINATES</div>
+            <div style={{ fontSize:10, color:"rgba(255,255,255,0.7)", letterSpacing:1, fontFamily:"monospace" }}>27°59'17"N · 86°55'31"E</div>
+          </div>
+          <div style={{ position:"absolute", bottom:8, right:12, fontSize:9, color:"rgba(255,255,255,0.25)", fontFamily:"'Outfit', sans-serif", letterSpacing:0.5 }}>Photo: Cristian Grecu / Unsplash</div>
+        </div>
       );
     }
 
-    /* ── PHOTO SCENE PLACEHOLDERS ── */
-    const PHOTO_BG = {
-      0: { bg:"linear-gradient(165deg,#081F2F 0%,#153350 55%,#0B2035 100%)", scene:"ice" },
-      2: { bg:"linear-gradient(180deg,#0A1E30 0%,#183A55 60%,#0A1E30 100%)", scene:"wall" },
-      3: { bg:"linear-gradient(155deg,#160E02 0%,#241806 55%,#100A01 100%)", scene:"camp" },
-      5: { bg:"linear-gradient(180deg,#181818 0%,#262626 55%,#141414 100%)", scene:"portrait" },
-    };
-
-    function IceScene() {
-      return (
-        <svg width="100%" height="100%" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" style={{position:"absolute",inset:0}}>
-          {[...Array(12)].map((_,i)=>(
-            <line key={i} x1={-20+i*28} y1="0" x2={i*28+60} y2="200" stroke="rgba(180,215,230,0.08)" strokeWidth="1"/>
-          ))}
-          <polygon points="0,200 80,60 130,120 200,20 260,90 300,30 300,200" fill="rgba(20,60,80,0.35)"/>
-          {[...Array(8)].map((_,i)=>(
-            <circle key={i} cx={30+i*36} cy={40+(i%3)*25} r="1.5" fill="rgba(200,230,240,0.3)"/>
-          ))}
-        </svg>
-      );
-    }
-    function WallScene() {
-      return (
-        <svg width="100%" height="100%" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" style={{position:"absolute",inset:0}}>
-          {[...Array(14)].map((_,i)=>(
-            <line key={i} x1="0" y1={i*16} x2="300" y2={i*16} stroke="rgba(180,220,240,0.06)" strokeWidth="1"/>
-          ))}
-          <line x1="150" y1="0" x2="150" y2="200" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeDasharray="6,4"/>
-        </svg>
-      );
-    }
-    function CampScene() {
-      return (
-        <svg width="100%" height="100%" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" style={{position:"absolute",inset:0}}>
-          <polygon points="80,160 110,120 140,160"  fill="rgba(200,169,110,0.45)"/>
-          <polygon points="155,165 185,118 215,165" fill="rgba(200,169,110,0.35)"/>
-          <ellipse cx="110" cy="162" rx="32" ry="8" fill="rgba(200,169,110,0.12)"/>
-        </svg>
-      );
-    }
-    function PortraitScene() {
-      return (
-        <svg width="100%" height="100%" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" style={{position:"absolute",inset:0}}>
-          <ellipse cx="150" cy="200" rx="90" ry="110" fill="rgba(40,30,20,0.7)"/>
-          <circle  cx="150" cy="80"  r="50"           fill="rgba(55,40,28,0.6)"/>
-          <ellipse cx="150" cy="70"  rx="38" ry="42"  fill="rgba(70,50,35,0.5)"/>
-          <ellipse cx="150" cy="48"  rx="44" ry="20"  fill="rgba(30,25,20,0.8)"/>
-        </svg>
-      );
-    }
-    const SceneMap = { ice:IceScene, wall:WallScene, camp:CampScene, portrait:PortraitScene };
-
-    /* ── MAIN APP ── */
     function App() {
-      const [blink,    setBlink]    = useState(true);
-      const [showPay,  setShowPay]  = useState(false);
-      const [selAmt,   setSelAmt]   = useState(500);
-      const [donated,  setDonated]  = useState(false);
-      const [monthly,  setMonthly]  = useState(false);
-      const [donorName,setDonorName]= useState("");
-      const [donorEmail,setDonorEmail]=useState("");
-      const [payStatus,setPayStatus]= useState("idle"); // idle | loading | success | error
-      const [payMsg,   setPayMsg]   = useState("");
-      const [appleAvail,setAppleAvail]=useState(false);
+      const [blink,      setBlink]      = useState(true);
+      const [showPay,    setShowPay]    = useState(false);
+      const [selAmt,     setSelAmt]     = useState(500);
+      const [donated,    setDonated]    = useState(false);
+      const [monthly,    setMonthly]    = useState(false);
+      const [donorName,  setDonorName]  = useState("");
+      const [donorEmail, setDonorEmail] = useState("");
+      const [payStatus,  setPayStatus]  = useState("idle");
+      const [payMsg,     setPayMsg]     = useState("");
 
       useEffect(()=>{
         const t = setInterval(()=>setBlink(b=>!b), 900);
-        /* Detect Apple Pay availability */
-        if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
-          setAppleAvail(true);
+        const params = new URLSearchParams(window.location.search);
+        const paymentResult = params.get("payment");
+        if (paymentResult === "success") {
+          setDonated(true); setPayStatus("success"); setShowPay(true);
+          window.history.replaceState({}, "", window.location.pathname);
+        } else if (paymentResult === "cancelled" || paymentResult === "failed") {
+          setShowPay(true);
+          setPayMsg(paymentResult === "cancelled" ? "Payment was cancelled." : "Payment failed. Please try again.");
+          window.history.replaceState({}, "", window.location.pathname);
         }
         return ()=>clearInterval(t);
       },[]);
 
-      const raised = donated ? 143300 : 142800;
-      const goal   = 350000;
-      const pct    = Math.round((raised / goal) * 100);
+      const raised  = donated ? 143300 : 142800;
+      const goal    = 350000;
+      const pct     = Math.round((raised / goal) * 100);
       const amounts = [250, 500, 1000, 2500];
 
-      /* ── YOCO PAYMENT ── */
-      const handleYocoPay = () => {
-        if (!donorName || !donorEmail) {
-          setPayMsg("Please enter your name and email before proceeding.");
-          return;
+      const handleYocoPay = async () => {
+        if (!donorName || !donorEmail) { setPayMsg("Please enter your name and email."); return; }
+        setPayMsg(""); setPayStatus("loading"); setShowPay(false);
+        try {
+          const res = await fetch(CHARGE_URL, {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({
+              amountInCents: selAmt * 100,
+              name: donorName,
+              email: donorEmail,
+              description: monthly ? `Monthly R${selAmt} donation` : `Donate R${selAmt}`
+            })
+          });
+          const data = await res.json();
+          if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+          } else {
+            setShowPay(true); setPayStatus("error");
+            setPayMsg(data.error || "Could not start payment. Please try again.");
+          }
+        } catch {
+          setShowPay(true); setPayStatus("error");
+          setPayMsg("Network error. Please try again.");
         }
-        setPayMsg("");
-        setPayStatus("loading");
-
-        /* 
-         * YOCO INTEGRATION
-         * Replace 'pk_test_REPLACE_WITH_YOUR_KEY' with your actual Yoco public key.
-         * You can find it in your Yoco Business Portal → Developers → API Keys.
-         */
-        const yoco = new window.YocoSDK({
-          publicKey: "pk_test_REPLACE_WITH_YOUR_KEY"
-        });
-
-        yoco.showPopup({
-          amountInCents: selAmt * 100,
-          currency: "ZAR",
-          name: "Summit with Zuko",
-          description: monthly
-            ? `Monthly donation of R${selAmt.toLocaleString()} — Everest 2026`
-            : `Donate R${selAmt.toLocaleString()} — Everest 2026`,
-          callback: function(result) {
-            if (result.error) {
-              setPayStatus("error");
-              setPayMsg(result.error.message || "Payment failed. Please try again.");
-            } else {
-              /*
-               * result.id is the Yoco payment token.
-               * Send this to YOUR server to complete the charge:
-               * POST /charge  { token: result.id, amountInCents: selAmt * 100, currency: "ZAR",
-               *                 name: donorName, email: donorEmail, monthly: monthly }
-               */
-              console.log("Yoco token received:", result.id);
-              setPayStatus("success");
-              setDonated(true);
-              setTimeout(()=>{ setShowPay(false); setPayStatus("idle"); }, 3000);
-            }
-          }
-        });
-
-        /* Reset loading state if popup was closed without paying */
-        setTimeout(()=>{ setPayStatus(s => s === "loading" ? "idle" : s); }, 500);
       };
 
-      /* ── APPLE PAY ── */
-      const handleApplePay = () => {
-        if (!window.ApplePaySession) return;
-
-        /*
-         * APPLE PAY INTEGRATION
-         * You must:
-         * 1. Register your domain at developer.apple.com → Merchant IDs
-         * 2. Host /.well-known/apple-developer-merchantid-domain-association
-         * 3. Replace 'merchant.com.yourcompany.summitzuko' with your Merchant ID
-         * 4. Validate the merchant session from your server
-         */
-        const request = {
-          countryCode: "ZA",
-          currencyCode: "ZAR",
-          supportedNetworks: ["visa", "masterCard", "amex"],
-          merchantCapabilities: ["supports3DS"],
-          total: {
-            label: "Summit with Zuko — Everest 2026",
-            amount: selAmt.toFixed(2)
-          }
-        };
-
-        const session = new ApplePaySession(3, request);
-
-        session.onvalidatemerchant = async (event) => {
-          /*
-           * Call your server to validate the merchant session.
-           * Your server calls Apple's API with event.validationURL,
-           * then passes the merchant session back here.
-           */
-          try {
-            const resp = await fetch("/api/apple-pay/validate-merchant", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ validationURL: event.validationURL })
-            });
-            const merchantSession = await resp.json();
-            session.completeMerchantValidation(merchantSession);
-          } catch(err) {
-            console.error("Apple Pay merchant validation failed:", err);
-            session.abort();
-          }
-        };
-
-        session.onpaymentauthorized = (event) => {
-          /*
-           * Send event.payment.token to your server to charge the customer.
-           * POST /api/apple-pay/charge  { token: event.payment.token, amount: selAmt }
-           */
-          console.log("Apple Pay token:", event.payment.token);
-          session.completePayment(ApplePaySession.STATUS_SUCCESS);
-          setPayStatus("success");
-          setDonated(true);
-          setTimeout(()=>{ setShowPay(false); setPayStatus("idle"); }, 3000);
-        };
-
-        session.oncancel = () => setPayStatus("idle");
-        session.begin();
-      };
-
-      /* ── FIELD LOG DATA ── */
+      /* ── FIELD LOG ENTRIES
+         Replace the image/video filenames below with the real ones from the client
+         photo entries: change image="PHOTO_FILENAME.jpg"
+         video entries: change video="VIDEO_FILENAME.mp4"
+      ── */
       const entries = [
-        { type:"photo",   idx:0, date:"APR 26 · 04:15", loc:"CAMP III · 7,162 M",
-          caption:"First light on the Lhotse Face. Worth every frozen breath." },
-        { type:"journal",        date:"APR 25 · 21:08", loc:"CAMP III · 7,162 M",
+        {
+          type:"photo",
+          date:"APR 26 · 04:15", loc:"CAMP III · 7,162 M",
+          caption:"First light on the Lhotse Face. Worth every frozen breath.",
+          image:"photo1.jpeg"  
+        },
+        {
+          type:"journal",
+          date:"APR 25 · 21:08", loc:"CAMP III · 7,162 M",
           title:"The thin air begins to teach",
-          body:"Above 7,000 m everything slows. Boiling water takes forever, thoughts take longer. I find myself counting steps in tens, then in fives, then in single beats. The mountain doesn't punish you — it just tells the truth about what you brought with you." },
-        { type:"video",   idx:2, date:"APR 24 · 16:42", loc:"LHOTSE FACE",
-          caption:"Fixed lines on the wall. 60° of blue ice for the next 800 m.", dur:"1:24" },
-        { type:"photo",   idx:3, date:"APR 22 · 18:55", loc:"CAMP II · 6,500 M",
-          caption:"Camp lit up like lanterns under the prayer flags." },
-        { type:"journal",        date:"APR 20 · 09:30", loc:"BASE CAMP · 5,364 M",
+          body:"Above 7,000 m everything slows. Boiling water takes forever, thoughts take longer. I find myself counting steps in tens, then in fives, then in single beats. The mountain doesn't punish you — it just tells the truth about what you brought with you."
+        },
+        {
+          type:"video",
+          date:"APR 24 · 16:42", loc:"LHOTSE FACE",
+          caption:"Fixed lines on the wall. 60° of blue ice for the next 800 m.",
+          dur:"1:24",
+          video:"video1.mp4"  
+        },
+        {
+          type:"photo",
+          date:"APR 22 · 18:55", loc:"CAMP II · 6,500 M",
+          caption:"Camp lit up like lanterns under the prayer flags.",
+          image:"photo2.jpeg"  
+        },
+        {
+          type:"journal",
+          date:"APR 20 · 09:30", loc:"BASE CAMP · 5,364 M",
           title:"Why I'm here",
-          body:"I'm not chasing a record. I'm chasing the version of myself that finishes what he starts. Every rand donated puts oxygen on my back and a sherpa beside me — this climb belongs to all of us." },
-        { type:"photo",   idx:5, date:"APR 18 · 12:38", loc:"BASE CAMP",
-          caption:"Boots on. The mountain is finally real." },
+          body:"I'm not chasing a record. I'm chasing the version of myself that finishes what he starts. Every rand donated puts oxygen on my back and a sherpa beside me — this climb belongs to all of us."
+        },
+        {
+          type:"photo",
+          date:"APR 18 · 12:38", loc:"BASE CAMP",
+          caption:"Boots on. The mountain is finally real.",
+          image:"photo3.jpeg"  
+        },
       ];
 
-      /* ── ICON HELPERS ── */
       const PhotoIcon   = ()=>(<svg width="12" height="12" viewBox="0 0 12 12"><rect x="0.5" y="2" width="11" height="9" rx="1.5" fill="none" stroke="white" strokeWidth="1.2"/><circle cx="6" cy="6.5" r="2.4" fill="none" stroke="white" strokeWidth="1.2"/><rect x="4.5" y="0.5" width="3" height="2" rx="0.5" fill="white"/></svg>);
       const VideoIcon   = ()=>(<svg width="12" height="12" viewBox="0 0 12 12"><rect x="0.5" y="2" width="8" height="8" rx="1" fill="none" stroke="white" strokeWidth="1.2"/><polygon points="11.8,6 8.5,3.5 8.5,8.5" fill="white"/></svg>);
       const JournalIcon = ()=>(<svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" rx="1.5" fill="none" stroke={GOLD} strokeWidth="1.2"/><line x1="3.5" y1="4" x2="8.5" y2="4" stroke={GOLD} strokeWidth="1"/><line x1="3.5" y1="6.5" x2="8.5" y2="6.5" stroke={GOLD} strokeWidth="1"/><line x1="3.5" y1="9" x2="7" y2="9" stroke={GOLD} strokeWidth="1"/></svg>);
@@ -327,201 +189,78 @@
       const LockIcon    = ()=>(<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 5V4a3 3 0 016 0v1h.5a1 1 0 011 1v4a1 1 0 01-1 1H2.5a1 1 0 01-1-1V6a1 1 0 011-1H3zm1 0h4V4a2 2 0 00-4 0v1z" fill="#444"/></svg>);
 
       return (
-        <div style={{ background:BG, color:"#fff", fontFamily:"'Outfit', 'Helvetica Neue', Arial, sans-serif", minHeight:"100vh" }}>
+        <div style={{ background:BG, color:"#fff", fontFamily:"'Outfit', sans-serif", minHeight:"100vh" }}>
           <style>{`
             *{box-sizing:border-box;margin:0;padding:0}
-            input,button,select{font-family:inherit}
+            input,button{font-family:inherit}
             ::selection{background:${GOLD}30}
-
-            /* ── Buttons ── */
-            .btn-gold{
-              background:${GOLD};color:#080808;border:none;cursor:pointer;
-              font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:2px;
-              font-size:11px;transition:background .2s,transform .1s;
-            }
+            .btn-gold{background:${GOLD};color:#080808;border:none;cursor:pointer;font-weight:600;letter-spacing:2px;font-size:11px;transition:background .2s,transform .1s}
             .btn-gold:hover{background:${GOLD2}}
             .btn-gold:active{transform:scale(.98)}
-
-            .btn-outline{
-              background:transparent;color:#888;
-              border:1px solid #2A2A2A;cursor:pointer;
-              font-weight:600;letter-spacing:2px;font-size:11px;
-              transition:border-color .2s,color .2s;
-            }
+            .btn-outline{background:transparent;color:#666;border:1px solid #2A2A2A;cursor:pointer;font-weight:600;letter-spacing:2px;font-size:11px;transition:border-color .2s,color .2s}
             .btn-outline:hover{border-color:${GOLD};color:${GOLD}}
-
-            /* ── Amount buttons ── */
-            .amt-btn{
-              background:transparent;color:#666;border:1px solid #222;
-              cursor:pointer;transition:all .15s;font-weight:500;
-              font-size:13px;padding:10px 0;border-radius:3px;width:100%;
-              font-family:'Outfit',sans-serif;
-            }
-            .amt-btn:hover{border-color:${GOLD};color:${GOLD}}
-            .amt-btn.sel{border-color:${GOLD};color:${GOLD};background:${GOLD}14}
-
-            /* ── Inputs ── */
-            .inp{
-              background:#0D0D0D;border:1px solid #222;color:#fff;
-              padding:12px 14px;border-radius:3px;width:100%;
-              font-size:13px;outline:none;transition:border-color .15s;
-              font-family:'Outfit',sans-serif;
-            }
-            .inp:focus{border-color:${GOLD};background:#111}
-            .inp::placeholder{color:#3A3A3A}
-
-            /* ── Log cards ── */
-            .log-card{
-              background:${CARD};border:1px solid ${BR};
-              border-radius:4px;overflow:hidden;transition:border-color .2s;
-            }
+            .amt-btn{background:transparent;color:#555;border:1px solid #222;cursor:pointer;transition:all .15s;font-weight:500;font-size:13px;padding:10px 0;border-radius:3px;width:100%;font-family:'Outfit',sans-serif}
+            .amt-btn:hover,.amt-btn.sel{border-color:${GOLD};color:${GOLD}}
+            .amt-btn.sel{background:${GOLD}14}
+            .inp{background:#0D0D0D;border:1px solid #222;color:#fff;padding:12px 14px;border-radius:3px;width:100%;font-size:13px;outline:none;transition:border-color .15s;font-family:'Outfit',sans-serif}
+            .inp:focus{border-color:${GOLD}}
+            .inp::placeholder{color:#333}
+            .log-card{background:${CARD};border:1px solid ${BR};border-radius:4px;overflow:hidden;transition:border-color .2s}
             .log-card:hover{border-color:#2A2A2A}
-
-            /* ── Toggle ── */
+            .section-label{font-weight:500;font-size:10px;letter-spacing:4px;color:${GOLD};text-transform:uppercase;margin-bottom:14px}
             .tog{width:42px;height:22px;border-radius:11px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
             .tog-knob{width:16px;height:16px;border-radius:50%;position:absolute;top:3px;transition:left .2s}
-
-            /* ── Animations ── */
             @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
             .modal-anim{animation:fadeUp .28s ease}
             @keyframes checkPop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
             .check-anim{animation:checkPop .4s ease}
-
-            /* ── Apple Pay button ── */
-            .apple-pay-btn{
-              -webkit-appearance:-apple-pay-button;
-              -apple-pay-button-type:donate;
-              -apple-pay-button-style:black;
-              width:100%;height:48px;cursor:pointer;border:none;
-              border-radius:3px;
-            }
-
-            /* ── Section label ── */
-            .section-label{
-              font-family:'Outfit',sans-serif;font-weight:500;
-              font-size:10px;letter-spacing:4px;color:${GOLD};
-              text-transform:uppercase;margin-bottom:14px;
-            }
-
-            /* ── Divider ── */
-            .pay-divider{
-              display:flex;align-items:center;gap:12px;
-              margin:16px 0;color:#333;font-size:10px;letter-spacing:2px;
-            }
-            .pay-divider::before,.pay-divider::after{
-              content:'';flex:1;height:1px;background:#1E1E1E;
-            }
+            @keyframes spin{to{transform:rotate(360deg)}}
           `}</style>
 
-          {/* ════ HEADER ════ */}
-          <header style={{
-            borderBottom:`1px solid ${BR}`,padding:"0 28px",height:54,
-            display:"flex",alignItems:"center",justifyContent:"space-between",
-            position:"sticky",top:0,background:BG,zIndex:100,
-          }}>
-            {/* Logo — matches summitwithzuko.com brand */}
-            <a href="#" style={{ textDecoration:"none", display:"flex", alignItems:"baseline", gap:0 }}>
-              <span style={{
-                fontFamily:"'Cormorant Garamond', serif",
-                fontWeight:400,fontSize:17,letterSpacing:1,color:"#E8E8E8",
-              }}>
-                Summit&nbsp;
-              </span>
-              <em style={{
-                fontFamily:"'Cormorant Garamond', serif",
-                fontStyle:"italic",fontWeight:300,
-                fontSize:17,letterSpacing:0.5,color:GOLD,
-              }}>
-                with Zuko
-              </em>
+          {/* ── HEADER ── */}
+          <header style={{ borderBottom:`1px solid ${BR}`,padding:"0 28px",height:54,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,background:BG,zIndex:100 }}>
+            <a href="#" style={{ textDecoration:"none",display:"flex",alignItems:"baseline" }}>
+              <span style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:400,fontSize:17,letterSpacing:1,color:"#E8E8E8" }}>Summit&nbsp;</span>
+              <em style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontWeight:300,fontSize:17,color:GOLD }}>with Zuko</em>
             </a>
-
-            <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-              <button className="btn-outline" style={{ padding:"7px 18px", borderRadius:3 }}>
-                FEED
-              </button>
-              <button
-                className="btn-gold"
-                style={{ padding:"7px 20px", borderRadius:3 }}
-                onClick={()=>setShowPay(true)}
-              >
-                DONATE
-              </button>
+            <div style={{ display:"flex",gap:10,alignItems:"center" }}>
+              <button className="btn-outline" style={{ padding:"7px 18px",borderRadius:3 }}>FEED</button>
+              <button className="btn-gold" style={{ padding:"7px 20px",borderRadius:3 }} onClick={()=>setShowPay(true)}>DONATE</button>
             </div>
           </header>
 
-          {/* ════ HERO ════ */}
-          <section style={{ padding:"56px 28px 38px", maxWidth:900, margin:"0 auto" }}>
+          {/* ── HERO ── */}
+          <section style={{ padding:"56px 28px 38px",maxWidth:960,margin:"0 auto" }}>
             <p className="section-label">Live Tracker · Everest 2026</p>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:28 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:28,marginBottom:36 }}>
               <div>
-                <h1 style={{
-                  fontFamily:"'Cormorant Garamond', serif",
-                  fontWeight:600,fontSize:"clamp(38px,5.5vw,68px)",
-                  lineHeight:1.06,letterSpacing:-0.5,
-                }}>
-                  Zuko is on&nbsp;<em style={{ fontStyle:"italic", color:GOLD }}>Mount Everest.</em>
+                <h1 style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:"clamp(38px,5.5vw,68px)",lineHeight:1.06,letterSpacing:-0.5 }}>
+                  Zuko is on&nbsp;<em style={{ fontStyle:"italic",color:GOLD }}>Mount Everest.</em>
                 </h1>
-                <h2 style={{
-                  fontFamily:"'Cormorant Garamond', serif",
-                  fontWeight:300,fontStyle:"italic",
-                  fontSize:"clamp(26px,4vw,48px)",
-                  lineHeight:1.15,color:"#555",margin:"6px 0 20px",
-                }}>
-                  Follow every step.
-                </h2>
-                <p style={{ color:"#666", fontSize:14, maxWidth:380, lineHeight:1.7, fontWeight:300 }}>
-                  A live view of the South Col route. The blinking marker is Zuko's
-                  current position, broadcast from his GPS tracker.
+                <p style={{ color:"#555",fontSize:14,maxWidth:380,lineHeight:1.7,fontWeight:300,marginTop:14 }}>
+                  A live view of the South Col route. The blinking marker is Zuko's current position, broadcast from his GPS tracker.
                 </p>
               </div>
-
-              {/* Status card */}
-              <div style={{
-                background:CARD,border:`1px solid ${BR}`,borderRadius:4,
-                padding:"18px 26px",display:"flex",gap:30,flexShrink:0,
-              }}>
+              <div style={{ background:CARD,border:`1px solid ${BR}`,borderRadius:4,padding:"18px 26px",display:"flex",gap:30,flexShrink:0 }}>
                 <div>
                   <p className="section-label" style={{ marginBottom:6 }}>Last Ping</p>
-                  <div style={{
-                    fontFamily:"'Cormorant Garamond', serif",
-                    fontWeight:600,fontSize:34,letterSpacing:0.5,lineHeight:1,
-                  }}>
+                  <div style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:34,letterSpacing:0.5,lineHeight:1 }}>
                     04:15 <span style={{ fontSize:13,color:MUTED,fontWeight:300,fontStyle:"italic" }}>SAST</span>
                   </div>
                 </div>
-                <div style={{ borderLeft:`1px solid ${BR}`, paddingLeft:26 }}>
+                <div style={{ borderLeft:`1px solid ${BR}`,paddingLeft:26 }}>
                   <p className="section-label" style={{ marginBottom:6 }}>Status</p>
-                  <div style={{
-                    fontFamily:"'Cormorant Garamond', serif",
-                    fontStyle:"italic",fontWeight:400,
-                    fontSize:22,color:GOLD,lineHeight:1,
-                  }}>
-                    Acclimatising
-                  </div>
+                  <div style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontWeight:400,fontSize:22,color:GOLD,lineHeight:1 }}>Acclimatising</div>
                 </div>
               </div>
             </div>
-          </section>
-
-          {/* ════ LIVE MAP ════ */}
-          <section style={{ maxWidth:900, margin:"0 auto 8px", padding:"0 28px" }}>
-            <div style={{ border:`1px solid ${BR}`, borderRadius:4, overflow:"hidden", background:"#060D14" }}>
-              <Mountain blink={blink}/>
-              {/* Stats bar */}
-              <div style={{ borderTop:`1px solid ${BR}`, display:"grid", gridTemplateColumns:"repeat(4,1fr)" }}>
-                {[
-                  { label:"Altitude", val:"7,162", unit:"m" },
-                  { label:"Temp",     val:"−28",   unit:"°C" },
-                  { label:"O₂ Sat",   val:"84",    unit:"%" },
-                  { label:"Wind",     val:"42",    unit:"km/h" },
-                ].map((s,i)=>(
-                  <div key={i} style={{ padding:"14px 22px", borderRight:i<3?`1px solid ${BR}`:"none" }}>
-                    <p className="section-label" style={{ marginBottom:4, fontSize:9 }}>{s.label}</p>
-                    <div style={{
-                      fontFamily:"'Cormorant Garamond', serif",
-                      fontWeight:600,fontSize:30,lineHeight:1.2,
-                    }}>
+            <div style={{ border:`1px solid ${BR}`,borderRadius:4,overflow:"hidden" }}>
+              <MountainTracker blink={blink}/>
+              <div style={{ borderTop:`1px solid ${BR}`,display:"grid",gridTemplateColumns:"repeat(4,1fr)",background:CARD }}>
+                {[{label:"Altitude",val:"7,162",unit:"m"},{label:"Temp",val:"−28",unit:"°C"},{label:"O₂ Sat",val:"84",unit:"%"},{label:"Wind",val:"42",unit:"km/h"}].map((s,i)=>(
+                  <div key={i} style={{ padding:"14px 22px",borderRight:i<3?`1px solid ${BR}`:"none" }}>
+                    <p className="section-label" style={{ marginBottom:4,fontSize:9 }}>{s.label}</p>
+                    <div style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:30,lineHeight:1.2 }}>
                       {s.val} <span style={{ fontSize:14,color:MUTED,fontWeight:300 }}>{s.unit}</span>
                     </div>
                   </div>
@@ -530,43 +269,30 @@
             </div>
           </section>
 
-          {/* ════ FIELD LOG ════ */}
-          <section style={{ maxWidth:900, margin:"68px auto", padding:"0 28px" }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:30 }}>
+          {/* ── FIELD LOG ── */}
+          <section style={{ maxWidth:960,margin:"68px auto",padding:"0 28px" }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:30 }}>
               <div>
                 <p className="section-label">Field Log</p>
-                <h2 style={{
-                  fontFamily:"'Cormorant Garamond', serif",
-                  fontWeight:400,fontSize:44,letterSpacing:-0.3,
-                }}>
-                  From the <em style={{ fontStyle:"italic", color:GOLD }}>Mountain</em>
+                <h2 style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:400,fontSize:44,letterSpacing:-0.3 }}>
+                  From the <em style={{ fontStyle:"italic",color:GOLD }}>Mountain</em>
                 </h2>
               </div>
-              <span style={{ fontSize:11, color:DIM, letterSpacing:2, paddingBottom:6, fontWeight:500 }}>6 ENTRIES</span>
+              <span style={{ fontSize:11,color:DIM,letterSpacing:2,paddingBottom:6,fontWeight:500 }}>6 ENTRIES</span>
             </div>
-
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
+            <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14 }}>
               {entries.map((e,i)=>{
                 if (e.type==="journal") {
                   return (
                     <div key={i} className="log-card" style={{ display:"flex",flexDirection:"column" }}>
-                      <div style={{ padding:"20px", display:"flex",flexDirection:"column",flex:1,minHeight:290 }}>
+                      <div style={{ padding:"20px",display:"flex",flexDirection:"column",flex:1,minHeight:290 }}>
                         <div style={{ display:"flex",gap:7,alignItems:"center",marginBottom:14 }}>
                           <JournalIcon/>
                           <span style={{ fontSize:10,fontWeight:600,letterSpacing:3,color:GOLD }}>JOURNAL</span>
                         </div>
-                        <h3 style={{
-                          fontFamily:"'Cormorant Garamond', serif",
-                          fontWeight:600,fontSize:22,lineHeight:1.25,marginBottom:12,
-                        }}>
-                          {e.title}
-                        </h3>
+                        <h3 style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:22,lineHeight:1.25,marginBottom:12 }}>{e.title}</h3>
                         <p style={{ fontSize:13,lineHeight:1.72,color:"#888",flex:1,fontWeight:300 }}>{e.body}</p>
-                        <div style={{
-                          marginTop:18,paddingTop:14,borderTop:`1px solid ${BR}`,
-                          fontSize:10,color:DIM,letterSpacing:1.5,
-                          display:"flex",justifyContent:"space-between",fontWeight:500,
-                        }}>
+                        <div style={{ marginTop:18,paddingTop:14,borderTop:`1px solid ${BR}`,fontSize:10,color:DIM,letterSpacing:1.5,display:"flex",justifyContent:"space-between",fontWeight:500 }}>
                           <span>{e.date}</span><span>{e.loc}</span>
                         </div>
                       </div>
@@ -574,24 +300,49 @@
                   );
                 }
 
-                const pbg = PHOTO_BG[e.idx] || { bg:"#1A1A1A", scene:"ice" };
-                const Scene = SceneMap[pbg.scene];
-                return (
-                  <div key={i} className="log-card">
-                    <div style={{ height:200, background:pbg.bg, position:"relative", overflow:"hidden", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      <Scene/>
-                      <div style={{ position:"absolute",top:10,left:10,background:"rgba(0,0,0,0.65)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:2,padding:"3px 9px",fontSize:10,fontWeight:600,letterSpacing:2,display:"flex",gap:5,alignItems:"center" }}>
-                        {e.type==="photo"?<PhotoIcon/>:<VideoIcon/>}
-                        {e.type==="photo"?"PHOTO":"VIDEO"}
-                      </div>
-                      {e.type==="video"&&(
-                        <>
-                          <div style={{ position:"absolute",top:10,right:10,background:"rgba(0,0,0,0.7)",borderRadius:2,padding:"2px 7px",fontSize:11,fontWeight:600 }}>{e.dur}</div>
-                          <div style={{ width:48,height:48,borderRadius:"50%",background:GOLD,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",zIndex:2,boxShadow:`0 0 0 8px ${GOLD}25` }}>
+                if (e.type==="video") {
+                  return (
+                    <div key={i} className="log-card">
+                      <div style={{ height:200,position:"relative",overflow:"hidden",background:"#000" }}>
+                        {/* ── VIDEO TAG — replace src with actual file ── */}
+<video
+  src={e.video}
+  style={{ width:"100%",height:"100%",objectFit:"cover",opacity:0.7 }}
+  muted playsInline loop autoPlay
+/>
+                        <div style={{ position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center" }}>
+                          <div style={{ width:48,height:48,borderRadius:"50%",background:GOLD,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 0 0 8px ${GOLD}25` }}>
                             <svg width="14" height="16" viewBox="0 0 16 18"><polygon points="3,1.5 15,9 3,16.5" fill="#080808"/></svg>
                           </div>
-                        </>
-                      )}
+                        </div>
+                        <div style={{ position:"absolute",top:10,left:10,background:"rgba(0,0,0,0.65)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:2,padding:"3px 9px",fontSize:10,fontWeight:600,letterSpacing:2,display:"flex",gap:5,alignItems:"center" }}>
+                          <VideoIcon/>VIDEO
+                        </div>
+                        <div style={{ position:"absolute",top:10,right:10,background:"rgba(0,0,0,0.7)",borderRadius:2,padding:"2px 7px",fontSize:11,fontWeight:600 }}>{e.dur}</div>
+                      </div>
+                      <div style={{ padding:"14px 16px 16px" }}>
+                        <p style={{ fontSize:13,color:"#C0C0C0",lineHeight:1.6,marginBottom:10,fontWeight:300 }}>{e.caption}</p>
+                        <div style={{ fontSize:10,color:DIM,letterSpacing:1.5,display:"flex",justifyContent:"space-between",fontWeight:500 }}>
+                          <span>{e.date}</span><span>{e.loc}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // photo
+                return (
+                  <div key={i} className="log-card">
+                    <div style={{ height:200,position:"relative",overflow:"hidden" }}>
+                      {/* ── IMAGE TAG — replace src with actual file ── */}
+                      <img
+                        src={e.image}
+                        alt={e.caption}
+                        style={{ width:"100%",height:"100%",objectFit:"cover",display:"block" }}
+                      />
+                      <div style={{ position:"absolute",top:10,left:10,background:"rgba(0,0,0,0.65)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:2,padding:"3px 9px",fontSize:10,fontWeight:600,letterSpacing:2,display:"flex",gap:5,alignItems:"center" }}>
+                        <PhotoIcon/>PHOTO
+                      </div>
                     </div>
                     <div style={{ padding:"14px 16px 16px" }}>
                       <p style={{ fontSize:13,color:"#C0C0C0",lineHeight:1.6,marginBottom:10,fontWeight:300 }}>{e.caption}</p>
@@ -605,213 +356,105 @@
             </div>
           </section>
 
-          {/* ════ DONATE SECTION ════ */}
-          <section style={{ maxWidth:900, margin:"0 auto 80px", padding:"0 28px" }}>
-            <div style={{
-              background:"linear-gradient(138deg,#0C0A04 0%,#141108 50%,#0A0804 100%)",
-              border:`1px solid #1E1C10`,borderRadius:4,
-              padding:"48px 52px",display:"grid",
-              gridTemplateColumns:"1fr 1fr",gap:56,
-            }}>
-              {/* Left */}
+          {/* ── DONATE SECTION ── */}
+          <section style={{ maxWidth:960,margin:"0 auto 80px",padding:"0 28px" }}>
+            <div style={{ background:"linear-gradient(138deg,#0C0A04 0%,#141108 50%,#0A0804 100%)",border:`1px solid #1E1C10`,borderRadius:4,padding:"48px 52px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:56 }}>
               <div>
                 <p className="section-label">Fund the Final Push</p>
-                <h2 style={{
-                  fontFamily:"'Cormorant Garamond', serif",
-                  fontWeight:600,fontSize:"clamp(28px,3.5vw,48px)",
-                  lineHeight:1.1,marginBottom:20,
-                }}>
+                <h2 style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:"clamp(28px,3.5vw,48px)",lineHeight:1.1,marginBottom:20 }}>
                   Help Zuko reach&nbsp;<em style={{ fontStyle:"italic",color:GOLD }}>the top.</em>
                 </h2>
-                <p style={{ color:"#666",fontSize:14,lineHeight:1.75,marginBottom:28,fontWeight:300 }}>
-                  Every rand fuels oxygen, sherpa support, and safe passage above the
-                  death zone. Stand with Zuko on the final 1,687 metres to the summit.
-                </p>
+                <p style={{ color:"#666",fontSize:14,lineHeight:1.75,marginBottom:28,fontWeight:300 }}>Every rand fuels oxygen, sherpa support, and safe passage above the death zone. Stand with Zuko on the final 1,687 metres.</p>
                 <div style={{ display:"flex",gap:8,flexWrap:"wrap" }}>
-                  {amounts.map(a=>(
-                    <span key={a} style={{ fontSize:12,color:DIM,padding:"5px 12px",border:`1px solid #1E1E1E`,borderRadius:2,fontWeight:500,letterSpacing:0.5 }}>
-                      R{a.toLocaleString()}
-                    </span>
-                  ))}
+                  {amounts.map(a=>(<span key={a} style={{ fontSize:12,color:DIM,padding:"5px 12px",border:`1px solid #1E1E1E`,borderRadius:2,fontWeight:500 }}>R{a.toLocaleString()}</span>))}
                 </div>
               </div>
-
-              {/* Right */}
               <div>
-                <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:8 }}>
+                <div style={{ display:"flex",justifyContent:"space-between",marginBottom:8 }}>
                   <p style={{ fontSize:10,letterSpacing:3,color:MUTED,fontWeight:500 }}>RAISED</p>
                   <p style={{ fontSize:10,letterSpacing:2,color:MUTED,fontWeight:500 }}>{pct}% OF GOAL</p>
                 </div>
-                <div style={{ fontFamily:"'Cormorant Garamond', serif",fontWeight:600,fontSize:56,letterSpacing:-1,lineHeight:1 }}>
-                  R{raised.toLocaleString()}
-                </div>
+                <div style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:56,letterSpacing:-1,lineHeight:1 }}>R{raised.toLocaleString()}</div>
                 <div style={{ margin:"18px 0 6px",height:2,background:"#1A1A1A",borderRadius:2,overflow:"hidden" }}>
                   <div style={{ height:"100%",width:`${pct}%`,background:`linear-gradient(90deg,${GOLD},${GOLD2})`,borderRadius:2,transition:"width 1.2s ease" }}/>
                 </div>
                 <div style={{ display:"flex",justifyContent:"space-between",fontSize:10,color:"#3A3A3A",marginBottom:28,letterSpacing:2,fontWeight:500 }}>
                   <span>GOAL</span><span>R{goal.toLocaleString()}</span>
                 </div>
-                <button
-                  className="btn-gold"
-                  style={{ width:"100%",padding:"15px",borderRadius:3,fontSize:11,display:"flex",alignItems:"center",justifyContent:"center",gap:10 }}
-                  onClick={()=>setShowPay(true)}
-                >
-                  <HeartIcon/>
-                  {donated?"DONATE AGAIN":"HELP ZUKO REACH THE TOP"}
+                <button className="btn-gold" style={{ width:"100%",padding:"15px",borderRadius:3,fontSize:11,display:"flex",alignItems:"center",justifyContent:"center",gap:10 }} onClick={()=>setShowPay(true)}>
+                  <HeartIcon/>{donated?"DONATE AGAIN":"HELP ZUKO REACH THE TOP"}
                 </button>
-                {donated&&(
-                  <div style={{ textAlign:"center",marginTop:12,color:GOLD,fontSize:12,fontWeight:500,letterSpacing:1 }}>
-                    ✓ &nbsp;Thank you for standing with Zuko
-                  </div>
-                )}
-                <div style={{ textAlign:"center",fontSize:10,color:"#333",marginTop:12,letterSpacing:2 }}>
-                  SECURE · ONE-TIME OR MONTHLY
-                </div>
+                {donated&&(<div style={{ textAlign:"center",marginTop:12,color:GOLD,fontSize:12,fontWeight:500,letterSpacing:1 }}>✓ &nbsp;Thank you for standing with Zuko</div>)}
+                <div style={{ textAlign:"center",fontSize:10,color:"#333",marginTop:12,letterSpacing:2 }}>SECURE · ONE-TIME OR MONTHLY</div>
               </div>
             </div>
           </section>
 
-          {/* ════ FOOTER ════ */}
+          {/* ── FOOTER ── */}
           <footer style={{ borderTop:`1px solid ${BR}`,padding:"22px 28px",display:"flex",justifyContent:"space-between",fontSize:10,color:DIM,letterSpacing:2,flexWrap:"wrap",gap:8,fontWeight:500 }}>
-            <span style={{ fontFamily:"'Cormorant Garamond', serif",fontWeight:400,fontSize:13,letterSpacing:1,color:"#3A3A3A" }}>
-              Summit <em style={{ fontStyle:"italic",color:"#2A2A2A" }}>with Zuko</em> · Everest 2026
-            </span>
+            <span style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:400,fontSize:13,letterSpacing:1,color:"#3A3A3A" }}>Summit <em style={{ fontStyle:"italic",color:"#2A2A2A" }}>with Zuko</em> · Everest 2026</span>
             <span>LIVE SIGNAL · 77-09-32-XX</span>
           </footer>
 
-          {/* ════ PAYMENT MODAL ════ */}
-          {showPay&&(
-            <div
-              style={{ position:"fixed",inset:0,background:"rgba(0,0,0,0.92)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999,padding:20 }}
-              onClick={ev=>ev.target===ev.currentTarget&&setShowPay(false)}
-            >
-              <div
-                className="modal-anim"
-                style={{ background:"#0C0C0C",border:`1px solid #1E1E1E`,borderRadius:4,width:"100%",maxWidth:460,padding:"36px 38px",position:"relative",maxHeight:"92vh",overflowY:"auto" }}
-              >
-                {/* Close */}
-                <button onClick={()=>{ setShowPay(false); setPayStatus("idle"); setPayMsg(""); }}
-                  style={{ position:"absolute",top:16,right:18,background:"none",border:"none",color:"#444",cursor:"pointer",fontSize:18,lineHeight:1,padding:4 }}>
-                  ✕
-                </button>
+          {/* ── LOADING SPINNER ── */}
+          {payStatus==="loading"&&(
+            <div style={{ position:"fixed",inset:0,background:"rgba(0,0,0,0.95)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:999999,gap:24 }}>
+              <div style={{ width:52,height:52,border:`3px solid ${GOLD}33`,borderTop:`3px solid ${GOLD}`,borderRadius:"50%",animation:"spin 0.8s linear infinite" }}/>
+              <p style={{ color:GOLD,fontSize:11,letterSpacing:3,fontWeight:500 }}>REDIRECTING TO PAYMENT…</p>
+              <p style={{ color:"#444",fontSize:10,letterSpacing:2 }}>SECURED BY YOCO</p>
+            </div>
+          )}
 
-                {/* ── SUCCESS STATE ── */}
+          {/* ── PAYMENT MODAL ── */}
+          {showPay&&(
+            <div style={{ position:"fixed",inset:0,background:"rgba(0,0,0,0.92)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999,padding:20 }}
+              onClick={ev=>ev.target===ev.currentTarget&&setShowPay(false)}>
+              <div className="modal-anim" style={{ background:"#0C0C0C",border:`1px solid #1E1E1E`,borderRadius:4,width:"100%",maxWidth:460,padding:"36px 38px",position:"relative",maxHeight:"92vh",overflowY:"auto" }}>
+                <button onClick={()=>{ setShowPay(false); setPayStatus("idle"); setPayMsg(""); }} style={{ position:"absolute",top:16,right:18,background:"none",border:"none",color:"#444",cursor:"pointer",fontSize:18,lineHeight:1,padding:4 }}>✕</button>
                 {payStatus==="success"?(
                   <div style={{ textAlign:"center",padding:"28px 0 18px" }}>
-                    <div className="check-anim" style={{ width:68,height:68,borderRadius:"50%",background:GOLD,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 22px" }}>
-                      <CheckIcon/>
-                    </div>
-                    <h3 style={{ fontFamily:"'Cormorant Garamond', serif",fontWeight:600,fontSize:32,marginBottom:10 }}>
-                      Donation received!
-                    </h3>
-                    <p style={{ color:"#777",fontSize:14,lineHeight:1.65,fontWeight:300 }}>
-                      Your R{selAmt.toLocaleString()} is fuelling the climb.
-                      <br/>Thank you for standing with Zuko.
-                    </p>
+                    <div className="check-anim" style={{ width:68,height:68,borderRadius:"50%",background:GOLD,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 22px" }}><CheckIcon/></div>
+                    <h3 style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:32,marginBottom:10 }}>Donation received!</h3>
+                    <p style={{ color:"#777",fontSize:14,lineHeight:1.65,fontWeight:300 }}>Your R{selAmt.toLocaleString()} is fuelling the climb.<br/>Thank you for standing with Zuko.</p>
                   </div>
                 ):(
                   <>
-                    {/* Header */}
                     <div style={{ marginBottom:28 }}>
                       <p className="section-label">Fund the Final Push</p>
-                      <h2 style={{ fontFamily:"'Cormorant Garamond', serif",fontWeight:600,fontSize:28 }}>
-                        Complete your&nbsp;<em style={{ fontStyle:"italic",color:GOLD }}>donation</em>
-                      </h2>
+                      <h2 style={{ fontFamily:"'Cormorant Garamond',serif",fontWeight:600,fontSize:28 }}>Complete your&nbsp;<em style={{ fontStyle:"italic",color:GOLD }}>donation</em></h2>
                     </div>
-
-                    {/* Amount */}
                     <div style={{ marginBottom:20 }}>
                       <p style={{ fontSize:10,color:MUTED,letterSpacing:3,marginBottom:10,fontWeight:500 }}>SELECT AMOUNT</p>
                       <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8 }}>
-                        {amounts.map(a=>(
-                          <button key={a} className={`amt-btn${selAmt===a?" sel":""}`} onClick={()=>setSelAmt(a)}>
-                            R{a.toLocaleString()}
-                          </button>
-                        ))}
+                        {amounts.map(a=>(<button key={a} className={`amt-btn${selAmt===a?" sel":""}`} onClick={()=>setSelAmt(a)}>R{a.toLocaleString()}</button>))}
                       </div>
                       <div style={{ marginTop:10,position:"relative" }}>
                         <span style={{ position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",fontSize:14,color:"#444" }}>R</span>
-                        <input type="text" className="inp" placeholder="Custom amount" style={{ paddingLeft:28 }}
-                          onChange={ev=>{ const v=parseInt(ev.target.value.replace(/\D/g,"")); if(v>0)setSelAmt(v); }}/>
+                        <input type="text" className="inp" placeholder="Custom amount" style={{ paddingLeft:28 }} onChange={ev=>{ const v=parseInt(ev.target.value.replace(/\D/g,"")); if(v>0)setSelAmt(v); }}/>
                       </div>
                     </div>
-
-                    {/* Monthly toggle */}
-                    <div
-                      style={{ background:"#111",border:"1px solid #1A1A1A",borderRadius:3,padding:"13px 16px",marginBottom:22,display:"flex",justifyContent:"space-between",alignItems:"center",gap:16,cursor:"pointer" }}
-                      onClick={()=>setMonthly(!monthly)}
-                    >
+                    <div style={{ background:"#111",border:"1px solid #1A1A1A",borderRadius:3,padding:"13px 16px",marginBottom:22,display:"flex",justifyContent:"space-between",alignItems:"center",gap:16,cursor:"pointer" }} onClick={()=>setMonthly(!monthly)}>
                       <div>
                         <div style={{ fontSize:13,fontWeight:500,marginBottom:2 }}>Make it monthly</div>
-                        <div style={{ fontSize:12,color:"#555",fontWeight:300 }}>Fund the full expedition, not just one day</div>
+                        <div style={{ fontSize:12,color:"#555",fontWeight:300 }}>Fund the full expedition</div>
                       </div>
                       <div className="tog" style={{ background:monthly?GOLD:"#1E1E1E" }}>
                         <div className="tog-knob" style={{ background:monthly?"#080808":"#444",left:monthly?23:3 }}/>
                       </div>
                     </div>
-
-                    {/* Donor info */}
                     <div style={{ marginBottom:20 }}>
                       <p style={{ fontSize:10,color:MUTED,letterSpacing:3,marginBottom:10,fontWeight:500 }}>YOUR DETAILS</p>
                       <div style={{ display:"grid",gap:10 }}>
-                        <input type="text" className="inp" placeholder="Full name" value={donorName}
-                          onChange={ev=>setDonorName(ev.target.value)}/>
-                        <input type="email" className="inp" placeholder="Email address" value={donorEmail}
-                          onChange={ev=>setDonorEmail(ev.target.value)}/>
+                        <input type="text" className="inp" placeholder="Full name" value={donorName} onChange={ev=>setDonorName(ev.target.value)}/>
+                        <input type="email" className="inp" placeholder="Email address" value={donorEmail} onChange={ev=>setDonorEmail(ev.target.value)}/>
                       </div>
                     </div>
-
-                    {/* Error message */}
-                    {payMsg&&(
-                      <div style={{ background:"#1A0A0A",border:"1px solid #3A1A1A",borderRadius:3,padding:"10px 14px",marginBottom:16,fontSize:12,color:"#CC6666",fontWeight:300 }}>
-                        {payMsg}
-                      </div>
-                    )}
-
-                    {/* ── APPLE PAY BUTTON (shows only on supported devices) ── */}
-                    {appleAvail&&(
-                      <>
-                        <button
-                          className="apple-pay-btn"
-                          onClick={handleApplePay}
-                          style={{ marginBottom:0 }}
-                        />
-                        <div className="pay-divider">OR PAY WITH CARD</div>
-                      </>
-                    )}
-
-                    {/* ── YOCO PAY BUTTON ── */}
-                    <button
-                      className="btn-gold"
-                      onClick={handleYocoPay}
-                      disabled={payStatus==="loading"}
-                      style={{
-                        width:"100%",padding:"15px",borderRadius:3,fontSize:11,
-                        display:"flex",alignItems:"center",justifyContent:"center",gap:10,
-                        opacity:(!donorName||!donorEmail)?0.45:1,
-                        cursor:(!donorName||!donorEmail)?"not-allowed":"pointer",
-                      }}
-                    >
-                      {payStatus==="loading"
-                        ? "Processing…"
-                        : `DONATE R${selAmt.toLocaleString()}${monthly?" / MONTH":""} →`
-                      }
+                    {payMsg&&(<div style={{ background:"#1A0A0A",border:"1px solid #3A1A1A",borderRadius:3,padding:"10px 14px",marginBottom:16,fontSize:12,color:"#CC6666",fontWeight:300 }}>{payMsg}</div>)}
+                    <button className="btn-gold" onClick={handleYocoPay} disabled={payStatus==="loading"} style={{ width:"100%",padding:"15px",borderRadius:3,fontSize:11,display:"flex",alignItems:"center",justifyContent:"center",gap:10,opacity:(!donorName||!donorEmail)?0.45:1,cursor:(!donorName||!donorEmail)?"not-allowed":"pointer" }}>
+                      {`DONATE R${selAmt.toLocaleString()}${monthly?" / MONTH":""} →`}
                     </button>
-
-                    {/* Yoco branding / security */}
                     <div style={{ textAlign:"center",fontSize:11,color:"#333",marginTop:14,display:"flex",gap:8,justifyContent:"center",alignItems:"center",letterSpacing:1 }}>
-                      <LockIcon/>
-                      <span>SECURED BY&nbsp;</span>
-                      <span style={{ color:GOLD,fontWeight:500 }}>YOCO</span>
-                      <span>&nbsp;· 128-BIT ENCRYPTION</span>
-                    </div>
-
-                    {/* Yoco badge note */}
-                    <div style={{ textAlign:"center",marginTop:10,fontSize:11,color:"#2A2A2A",fontWeight:300 }}>
-                      Powered by&nbsp;
-                      <a href="https://www.yoco.com" target="_blank" rel="noopener"
-                        style={{ color:"#3A3A3A",textDecoration:"underline" }}>Yoco</a>
-                      &nbsp;— South Africa's trusted payment gateway
+                      <LockIcon/><span>SECURED BY&nbsp;</span><span style={{ color:GOLD,fontWeight:500 }}>YOCO</span><span>&nbsp;· 128-BIT ENCRYPTION</span>
                     </div>
                   </>
                 )}
@@ -822,8 +465,7 @@
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App/>);
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
   </script>
 </body>
 </html>
