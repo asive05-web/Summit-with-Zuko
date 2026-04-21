@@ -34,7 +34,7 @@
 
     const CHARGE_URL = "https://yococharge-hzj7232i5a-uc.a.run.app";
 
-    function MountainTracker({ blink }) {
+    function MountainTracker({ blink, isMobile }) {
       const routePoints = [
         { x: 49.5, y: 10,  label: "SUMMIT · 8,849 M",   type: "summit" },
         { x: 51,   y: 28,  label: "CAMP IV · 7,950 M",  type: "camp"   },
@@ -43,7 +43,7 @@
         { x: 57,   y: 76,  label: "BASE CAMP · 5,364 M",type: "base"   },
       ];
       return (
-        <div style={{ position:"relative", width:"100%", aspectRatio:"16/9", overflow:"hidden", borderRadius:4 }}>
+        <div style={{ position:"relative", width:"100%", aspectRatio:isMobile?"4/3":"16/9", overflow:"hidden", borderRadius:4 }}>
           <img src="mountain.jpg" alt="Mount Everest" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 30%", display:"block" }}/>
           <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 55%, rgba(0,0,0,0.65) 100%)", pointerEvents:"none" }}/>
           <svg style={{ position:"absolute", inset:0, width:"100%", height:"100%", overflow:"visible" }} viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -59,21 +59,25 @@
                   <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:24, height:24, borderRadius:"50%", background:GOLD, opacity:0.25 }}/>
                 </>)}
                 <div style={{ width:isLive?12:isSummit?8:7, height:isLive?12:isSummit?8:7, borderRadius:"50%", background:isLive?GOLD:isSummit?"#fff":"rgba(255,255,255,0.6)", border:isLive?`2px solid rgba(255,255,255,0.8)`:`1.5px solid rgba(255,255,255,0.5)`, position:"relative", zIndex:2, boxShadow:isLive?`0 0 12px ${GOLD}80`:"none" }}/>
-                <div style={{ position:"absolute", left:i%2===0?"calc(100% + 10px)":"auto", right:i%2!==0?"calc(100% + 10px)":"auto", top:"50%", transform:"translateY(-50%)", whiteSpace:"nowrap", background:isLive?"rgba(0,0,0,0.85)":"rgba(0,0,0,0.55)", border:isLive?`1px solid ${GOLD}99`:"1px solid rgba(255,255,255,0.15)", borderRadius:3, padding:isLive?"4px 10px":"3px 8px", fontSize:isLive?10:9, fontWeight:isLive?700:500, letterSpacing:1.5, color:isLive?"#fff":"rgba(255,255,255,0.65)", fontFamily:"'Courier New', monospace" }}>
-                  {isLive && <span style={{ color:GOLD, marginRight:5 }}>●</span>}
-                  {pt.label}
-                </div>
+                {!isMobile && (
+                  <div style={{ position:"absolute", left:i%2===0?"calc(100% + 10px)":"auto", right:i%2!==0?"calc(100% + 10px)":"auto", top:"50%", transform:"translateY(-50%)", whiteSpace:"nowrap", background:isLive?"rgba(0,0,0,0.85)":"rgba(0,0,0,0.55)", border:isLive?`1px solid ${GOLD}99`:"1px solid rgba(255,255,255,0.15)", borderRadius:3, padding:isLive?"4px 10px":"3px 8px", fontSize:isLive?10:9, fontWeight:isLive?700:500, letterSpacing:1.5, color:isLive?"#fff":"rgba(255,255,255,0.65)", fontFamily:"'Courier New', monospace" }}>
+                    {isLive && <span style={{ color:GOLD, marginRight:5 }}>●</span>}
+                    {pt.label}
+                  </div>
+                )}
               </div>
             );
           })}
-          <div style={{ position:"absolute", top:16, left:16, display:"flex", alignItems:"center", gap:8, background:"rgba(0,0,0,0.7)", border:`1px solid rgba(255,255,255,0.15)`, borderRadius:20, padding:"6px 14px" }}>
-            <div style={{ width:8, height:8, borderRadius:"50%", background:blink?GOLD:`${GOLD}55`, boxShadow:blink?`0 0 8px ${GOLD}`:"none", transition:"all 0.3s" }}/>
-            <span style={{ fontSize:10, fontWeight:700, letterSpacing:2.5, color:"rgba(255,255,255,0.85)", fontFamily:"'Courier New', monospace" }}>LIVE · TRACKING</span>
+          <div style={{ position:"absolute", top:12, left:12, display:"flex", alignItems:"center", gap:8, background:"rgba(0,0,0,0.7)", border:`1px solid rgba(255,255,255,0.15)`, borderRadius:20, padding:isMobile?"5px 10px":"6px 14px" }}>
+            <div style={{ width:7, height:7, borderRadius:"50%", background:blink?GOLD:`${GOLD}55`, boxShadow:blink?`0 0 8px ${GOLD}`:"none", transition:"all 0.3s" }}/>
+            <span style={{ fontSize:isMobile?9:10, fontWeight:700, letterSpacing:2, color:"rgba(255,255,255,0.85)", fontFamily:"'Courier New', monospace" }}>LIVE · TRACKING</span>
           </div>
-          <div style={{ position:"absolute", top:16, right:16, background:"rgba(0,0,0,0.6)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:3, padding:"5px 12px" }}>
-            <div style={{ fontSize:8, color:"rgba(255,255,255,0.4)", letterSpacing:2, fontFamily:"monospace", marginBottom:2 }}>COORDINATES</div>
-            <div style={{ fontSize:10, color:"rgba(255,255,255,0.7)", letterSpacing:1, fontFamily:"monospace" }}>27°59'17"N · 86°55'31"E</div>
-          </div>
+          {!isMobile && (
+            <div style={{ position:"absolute", top:16, right:16, background:"rgba(0,0,0,0.6)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:3, padding:"5px 12px" }}>
+              <div style={{ fontSize:8, color:"rgba(255,255,255,0.4)", letterSpacing:2, fontFamily:"monospace", marginBottom:2 }}>COORDINATES</div>
+              <div style={{ fontSize:10, color:"rgba(255,255,255,0.7)", letterSpacing:1, fontFamily:"monospace" }}>27°59'17"N · 86°55'31"E</div>
+            </div>
+          )}
           <div style={{ position:"absolute", bottom:8, right:12, fontSize:9, color:"rgba(255,255,255,0.3)", fontFamily:"'Outfit', sans-serif" }}>Photo: Cristian Grecu / Unsplash</div>
         </div>
       );
@@ -292,7 +296,7 @@
               </div>
             </div>
             <div style={{ border:`1px solid ${BR}`, borderRadius:4, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,0.07)" }}>
-              <MountainTracker blink={blink}/>
+              <MountainTracker blink={blink} isMobile={isMobile}/>
               <div style={{ borderTop:`1px solid ${BR}`, display:"grid", gridTemplateColumns:"repeat(4,1fr)", background:CARD }}>
                 {[{label:"Altitude",val:"7,162",unit:"m"},{label:"Temp",val:"−28",unit:"°C"},{label:"O₂ Sat",val:"84",unit:"%"},{label:"Wind",val:"42",unit:"km/h"}].map((s,i)=>(
                   <div key={i} style={{ padding:`${isMobile?"10px 12px":"14px 22px"}`, borderRight:i<3?`1px solid ${BR}`:"none" }}>
