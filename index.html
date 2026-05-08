@@ -71,12 +71,12 @@
           })}
           <div style={{ position:"absolute", top:12, left:12, display:"flex", alignItems:"center", gap:8, background:"rgba(0,0,0,0.7)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:20, padding:isMobile?"5px 10px":"6px 14px" }}>
             <div style={{ width:7, height:7, borderRadius:"50%", background:blink?GOLD:`${GOLD}55`, boxShadow:blink?`0 0 8px ${GOLD}`:"none", transition:"all 0.3s" }}/>
-            <span style={{ fontSize:isMobile?9:10, fontWeight:700, letterSpacing:2, color:"rgba(255,255,255,0.85)", fontFamily:"'Courier New', monospace" }}>LIVE \u00b7 TRACKING</span>
+            <span style={{ fontSize:isMobile?9:10, fontWeight:700, letterSpacing:2, color:"rgba(255,255,255,0.85)", fontFamily:"'Courier New', monospace" }}>LIVE · TRACKING</span>
           </div>
           {!isMobile && (
             <div style={{ position:"absolute", top:16, right:16, background:"rgba(0,0,0,0.6)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:3, padding:"5px 12px" }}>
               <div style={{ fontSize:8, color:"rgba(255,255,255,0.4)", letterSpacing:2, fontFamily:"monospace", marginBottom:2 }}>COORDINATES</div>
-              <div style={{ fontSize:10, color:"rgba(255,255,255,0.7)", letterSpacing:1, fontFamily:"monospace" }}>27\u00b059'17"N \u00b7 86\u00b055'31"E</div>
+              <div style={{ fontSize:10, color:"rgba(255,255,255,0.7)", letterSpacing:1, fontFamily:"monospace" }}>27°59'17"N · 86°55'31"E</div>
             </div>
           )}
           <div style={{ position:"absolute", bottom:0, left:0, right:0, display:"grid", gridTemplateColumns:"repeat(4,1fr)", background:"rgba(0,0,0,0.55)", backdropFilter:"blur(6px)", borderTop:"1px solid rgba(255,255,255,0.1)" }}>
@@ -283,7 +283,7 @@
 
           {/* HERO */}
           <section style={{ padding:`${isMobile?"32px":"56px"} ${px} 38px`, maxWidth:960, margin:"0 auto" }}>
-            <p className="section-label">Live Tracker \u00b7 Everest 2026</p>
+            <p className="section-label">Live Tracker · Everest 2026</p>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:isMobile?16:28, marginBottom:isMobile?24:36 }}>
               <div>
                 <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:`clamp(${isMobile?"28px":"38px"},5.5vw,68px)`, lineHeight:1.06, letterSpacing:-0.5, color:TEXT }}>
@@ -425,15 +425,15 @@
                   <HeartIcon/>{donated?"DONATE AGAIN":"HELP ZUKO REACH THE TOP"}
                 </button>
                 {donated&&(<div style={{ textAlign:"center", marginTop:12, color:GOLD, fontSize:12, fontWeight:500, letterSpacing:1 }}>{"\u2713"} &nbsp;Thank you for standing with Zuko</div>)}
-                <div style={{ textAlign:"center", fontSize:10, color:MUTED, marginTop:10, letterSpacing:2 }}>SECURE \u00b7 ONE-TIME OR MONTHLY</div>
+                <div style={{ textAlign:"center", fontSize:10, color:MUTED, marginTop:10, letterSpacing:2 }}>SECURE · ONE-TIME OR MONTHLY</div>
               </div>
             </div>
           </section>
 
           {/* FOOTER */}
           <footer style={{ borderTop:`1px solid ${BR}`, padding:`20px ${px}`, display:"flex", justifyContent:"space-between", fontSize:10, color:MUTED, letterSpacing:2, flexWrap:"wrap", gap:8, fontWeight:500 }}>
-            <span style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:400, fontSize:13, letterSpacing:1, color:"#BBB5A8" }}>Summit <em style={{ fontStyle:"italic" }}>with Zuko</em> \u00b7 Everest 2026</span>
-            <span>LIVE SIGNAL \u00b7 77-09-32-XX</span>
+            <span style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:400, fontSize:13, letterSpacing:1, color:"#BBB5A8" }}>Summit <em style={{ fontStyle:"italic" }}>with Zuko</em> · Everest 2026</span>
+            <span>LIVE SIGNAL · 77-09-32-XX</span>
           </footer>
 
           {/* LOADING SPINNER */}
@@ -494,7 +494,7 @@
                       {`DONATE R${selAmt.toLocaleString()}${monthly?" / MONTH":""} \u2192`}
                     </button>
                     <div style={{ textAlign:"center", fontSize:11, color:MUTED, marginTop:12, display:"flex", gap:8, justifyContent:"center", alignItems:"center", letterSpacing:1 }}>
-                      <LockIcon/><span>SECURED BY&nbsp;</span><span style={{ color:GOLD, fontWeight:500 }}>YOCO</span><span>&nbsp;\u00b7 128-BIT ENCRYPTION</span>
+                      <LockIcon/><span>SECURED BY&nbsp;</span><span style={{ color:GOLD, fontWeight:500 }}>YOCO</span><span>&nbsp;· 128-BIT ENCRYPTION</span>
                     </div>
                   </>
                 )}
