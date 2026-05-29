@@ -36,9 +36,10 @@
 
     function MountainTracker({ blink, isMobile }) {
       const routePoints = [
-        { x: 49.5, y: 10,  label: "SUMMIT \u00b7 8,849 M",      type: "summit" },
+        { x: 49.5, y: 10,  label: "SUMMIT \u00b7 8,849 M",      type: "camp"   },
         { x: 51,   y: 28,  label: "CAMP IV \u00b7 7,950 M",     type: "camp"   },
-        { x: 53,   y: 44,  label: "CAMP III \u00b7 7,000 M",    type: "live"   },
+        { x: 52,   y: 36,  label: "HIGH CAMP \u00b7 8,000 M",   type: "live"   },
+        { x: 53,   y: 44,  label: "CAMP III \u00b7 7,000 M",    type: "camp"   },
         { x: 55,   y: 60,  label: "CAMP II \u00b7 6,500 M",     type: "camp"   },
         { x: 57,   y: 76,  label: "BASE CAMP \u00b7 5,364 M",   type: "camp"   },
         { x: 59.5, y: 84,  label: "DINGBOCHE \u00b7 4,410 M",   type: "camp"   },
@@ -80,7 +81,7 @@
             </div>
           )}
           <div style={{ position:"absolute", bottom:0, left:0, right:0, display:"grid", gridTemplateColumns:"repeat(4,1fr)", background:"rgba(0,0,0,0.55)", backdropFilter:"blur(6px)", borderTop:"1px solid rgba(255,255,255,0.1)" }}>
-            {[{label:"Altitude",val:"7,000",unit:"m"},{label:"Temp",val:"\u221228",unit:"\u00b0C"},{label:"O\u2082 Sat",val:"72",unit:"%"},{label:"Wind",val:"34",unit:"km/h"}].map((s,i)=>(
+            {[{label:"Altitude",val:"8,000",unit:"m"},{label:"Temp",val:"\u221234",unit:"\u00b0C"},{label:"O\u2082 Sat",val:"68",unit:"%"},{label:"Wind",val:"41",unit:"km/h"}].map((s,i)=>(
               <div key={i} style={{ padding:isMobile?"10px 10px":"14px 20px", borderRight:i<3?"1px solid rgba(255,255,255,0.1)":"none" }}>
                 <div style={{ fontSize:8, fontWeight:500, letterSpacing:3, color:"rgba(255,255,255,0.5)", textTransform:"uppercase", marginBottom:3 }}>{s.label}</div>
                 <div style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:isMobile?20:26, lineHeight:1.1, color:"#fff" }}>
@@ -302,7 +303,7 @@
                 </div>
                 <div style={{ borderLeft:`1px solid ${BR}`, paddingLeft:isMobile?16:22 }}>
                   <p className="section-label" style={{ marginBottom:4 }}>Status</p>
-                  <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontWeight:400, fontSize:20, color:GOLD, lineHeight:1 }}>Camp III</div>
+                  <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontWeight:400, fontSize:20, color:GOLD, lineHeight:1 }}>High Camp</div>
                 </div>
               </div>
             </div>
