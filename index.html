@@ -6,7 +6,8 @@
   <title>Summit with Zuko · Everest 2026</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.23.4/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -20,7 +21,7 @@
   <div id="root"></div>
 
   <script type="text/babel" data-presets="react">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useRef } = React;
 
     const GOLD   = "#B8924A";
     const GOLD2  = "#D4A85A";
@@ -33,6 +34,408 @@
     const TEXTSUB= "#6B6760";
 
     const CHARGE_URL = "https://yococharge-hzj7232i5a-uc.a.run.app";
+
+    // ---- EmailJS config ----------------------------------------------------
+    // 1. Create a free account at https://www.emailjs.com
+    // 2. Add an Email Service (Gmail/Outlook etc.) -> copy its Service ID below
+    // 3. Create an Email Template with variables matching the keys sent in
+    //    `templateParams` inside handleApplySubmit(), and set "To Email" to
+    //    Zuko's address (team@summitwithzuko.co.za, or whichever he confirms).
+    // 4. Copy the Template ID and your Public Key (Account > General) below.
+    const EMAILJS_PUBLIC_KEY  = "Z2z8aHrja4r3nrsb_";
+    const EMAILJS_SERVICE_ID  = "service_gs4s7ob";
+    const EMAILJS_TEMPLATE_ID = "template_ulhfrdj";
+    // Confirmed: "To Email" is already hardcoded to this address inside the
+    // EmailJS template itself, so this constant is just for reference here.
+    const APPLICATION_RECEIVING_EMAIL = "zstisani@gmail.com";
+
+    // ---- Application form configuration ------------------------------------
+    const APPLICATION_STEPS = [
+      {
+        title: "Personal Information",
+        sub: "Section 1",
+        fields: [
+          { id:"fullName", label:"Full Name", type:"text", required:true },
+          { id:"dob", label:"Date of Birth", type:"date", required:true },
+          { id:"email", label:"Email Address", type:"email", required:true },
+          { id:"phone", label:"Phone Number", type:"tel", required:true },
+          { id:"province", label:"Province of Residence", type:"radio", required:true,
+            options:["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo","Mpumalanga","North West","Northern Cape","Western Cape","Outside South Africa"] },
+          { id:"outsideCountry", label:"If outside South Africa, which country?", type:"text", required:false },
+          { id:"gender", label:"Gender", type:"radio", required:true,
+            options:["Male","Female","Non-binary","Prefer not to say"] },
+          { id:"howHeard", label:"How did you hear about the Team South Africa Everest 2027 expedition?", type:"radio", required:true,
+            options:["Social media (Instagram / TikTok / X)","News article / media coverage","Friend or family referral","Summit With Zuko website","Event or keynote","Other"] },
+          { id:"howHeardOther", label:"If other, please specify", type:"text", required:false },
+        ]
+      },
+      {
+        title: "Who You Are",
+        sub: "Section 2",
+        fields: [
+          { id:"aboutYou", label:"In 3–4 sentences, tell us who you are beyond your CV.", hint:"Not your job title. Who are you?", type:"textarea", required:true },
+          { id:"values", label:"What values guide how you live and make decisions?", type:"textarea", required:true },
+          { id:"cause", label:"What cause or community are you climbing for?", hint:"Think beyond yourself — who does your summit serve?", type:"textarea", required:true },
+          { id:"changeOneThing", label:"If your summit story could change one thing in South Africa, what would it be?", type:"textarea", required:true },
+        ]
+      },
+      {
+        title: "What Everest Means To You",
+        sub: "Section 3",
+        fields: [
+          { id:"everestMeaning", label:"What does Everest mean to you — not as a mountain, but as a symbol?", type:"textarea", required:true, big:true },
+          { id:"whyYouBelong", label:"Why do YOU specifically belong on Team South Africa's 2027 Everest expedition — and what will you bring to the team, not just the summit?", hint:"No word limit. This is the most important question on this form. Take your time.", type:"textarea", required:true, big:true },
+        ]
+      },
+      {
+        title: "Physical Fitness & Endurance",
+        sub: "Section 4",
+        fields: [
+          { id:"fitnessLevel", label:"Current fitness level", type:"radio", required:true,
+            options:["Recreational","Intermediate","Advanced / Competitive","Elite / Professional"] },
+          { id:"completedEvents", label:"Which of the following have you completed? (Select all that apply)", type:"checkbox", required:false,
+            options:["Marathon (42km)","Ultramarathon (50km+)","IRONMAN triathlon","Half IRONMAN / Sprint triathlon","Cycling race 100km+","Comrades Marathon","Ocean swim event","Other endurance event","None of the above"] },
+          { id:"completedOther", label:"If other, please describe", type:"text", required:false },
+          { id:"structuredTraining", label:"Do you currently follow a structured training programme?", type:"radio", required:true,
+            options:["Yes, self-directed","Yes, with a coach","Loosely / inconsistently","No"] },
+          { id:"weeklyRoutine", label:"Briefly describe your current weekly training routine", type:"textarea", required:false },
+          { id:"vo2max", label:"What is your approximate VO2 max, if known?", hint:"Leave blank if unknown — this is optional but useful. e.g. 52 ml/kg/min", type:"text", required:false },
+          { id:"enduranceExperience", label:"Describe your most challenging physical endurance experience to date", type:"textarea", required:true },
+        ]
+      },
+      {
+        title: "Altitude & Expedition Experience",
+        sub: "Section 5",
+        fields: [
+          { id:"highestAltitude", label:"What is the highest altitude you have ever been to, and in what context?", hint:"e.g. 4,200m — hiking in the Drakensberg / Kilimanjaro summit", type:"textarea", required:true },
+          { id:"summitedPeaks", label:"Have you summited any peaks? If yes, list them with approximate dates", type:"textarea", required:false },
+          { id:"sleptAbove4000", label:"Have you ever slept above 4,000m?", type:"radio", required:true, options:["Yes","No"] },
+          { id:"sleptAbove5500", label:"Have you ever slept above 5,500m?", type:"radio", required:false, options:["Yes","No"] },
+          { id:"usedOxygen", label:"Have you ever used supplemental oxygen?", type:"radio", required:false, options:["Yes","No","Not yet, but familiar with the concept"] },
+          { id:"altitudeSickness", label:"Have you ever experienced altitude sickness (AMS, HACE, or HAPE)?", type:"radio", required:true, options:["Yes","No","Unsure / mild symptoms"] },
+          { id:"altitudeSicknessDescribe", label:"If yes, please describe the circumstances and how you responded", type:"textarea", required:false },
+        ]
+      },
+      {
+        title: "Mental Resilience",
+        sub: "Section 6",
+        fields: [
+          { id:"hardDecision", label:"Describe a moment when you had to make a hard decision to turn back, stop, or quit something. What did you do and why?", hint:"There is no wrong answer — honesty is what we're looking for.", type:"textarea", required:true },
+          { id:"manageFear", label:"How do you manage fear, uncertainty, or physical suffering in extreme conditions?", type:"textarea", required:true },
+          { id:"peaceScale", label:"On a scale of 1–10, how at peace are you with the possibility of not reaching the summit?", hint:"1 = I would be devastated / 10 = The journey is enough. Be honest.", type:"scale", required:true },
+        ]
+      },
+      {
+        title: "Discipline & Time Management",
+        sub: "Section 7",
+        fields: [
+          { id:"employment", label:"What is your current employment / life situation?", type:"radio", required:true,
+            options:["Full-time employed","Self-employed / entrepreneur","Part-time employed","Student","Unemployed / career break","Other"] },
+          { id:"balanceResponsibilities", label:"Do you currently balance multiple major responsibilities (work, family, study, business)? How do you manage them?", type:"textarea", required:true },
+          { id:"structuredCommitment", label:"Have you ever maintained a structured commitment — training programme, study plan, or personal goal — for 6 months or longer? Describe it and the outcome.", type:"textarea", required:true },
+          { id:"nutritionPlan", label:"Are you willing to follow a structured nutrition plan prescribed by the expedition's sports science team?", type:"radio", required:true,
+            options:["Yes, fully committed","Yes, with noted dietary restrictions","Unsure — would need more detail","No"] },
+          { id:"followedDiet", label:"Have you ever followed a structured diet or eating plan for an extended period? What was the outcome?", type:"textarea", required:false },
+          { id:"dietaryRestrictions", label:"Do you have any dietary restrictions or health-related food requirements we should know about?", type:"checkbox", required:false,
+            options:["None","Vegetarian","Vegan","Halaal","Kosher","Gluten-free","Other"] },
+          { id:"dietaryOther", label:"If other, please describe", type:"text", required:false },
+        ]
+      },
+      {
+        title: "Health & Medical",
+        sub: "Section 8",
+        fields: [
+          { id:"preExistingConditions", label:"Do you have any pre-existing medical conditions we should be aware of?", type:"radio", required:true, options:["Yes","No"] },
+          { id:"conditionsDescribe", label:"If yes, please describe (condition, current management, medication if any)", type:"textarea", required:false },
+          { id:"preExistingInjuries", label:"Do you have any pre-existing injuries — current or recurring — that could affect your ability to train or climb?", type:"radio", required:true, options:["Yes","No"] },
+          { id:"injuriesDescribe", label:"If yes, please describe (injury, severity, current status)", type:"textarea", required:false },
+          { id:"cardioAssessment", label:"Have you had a cardiovascular or VO2 max assessment in the last 12 months?", type:"radio", required:true, options:["Yes","Scheduled / in progress","No"] },
+          { id:"medicalClearance", label:"Are you willing to complete a mandatory full medical clearance before final team selection?", type:"radio", required:true, options:["Yes","No"] },
+        ]
+      },
+      {
+        title: "Commitment, Logistics & Media",
+        sub: "Section 9",
+        fields: [
+          { id:"availability", label:"The expedition window is approximately April–June 2027. Are you available for this full period?", type:"radio", required:true,
+            options:["Yes, fully available","Mostly available — some constraints","No — but I'd like to discuss"] },
+          { id:"availabilityConstraints", label:"If you have constraints, please explain", type:"textarea", required:false },
+          { id:"startImmediately", label:"Are you willing to begin an intensive training and preparation programme immediately (from date of selection)?", hint:"The window to summit is approximately 10–11 months. Training must start now.", type:"radio", required:true, options:["Yes","No","Needs discussion"] },
+          { id:"saPassport", label:"Do you have a valid South African passport with at least 18 months validity?", type:"radio", required:true, options:["Yes","I hold another passport","No"] },
+          { id:"travelInsurance", label:"Do you have, or are you able to obtain, expedition and travel insurance?", type:"radio", required:true,
+            options:["Yes, already have it","Yes, I can obtain it","Not sure — need guidance","No"] },
+          { id:"mediaComfort", label:"Are you comfortable being featured in media coverage, documentary content, and brand campaigns as part of Team South Africa?", type:"radio", required:true,
+            options:["Yes, fully comfortable","Yes, with some boundaries","Prefer minimal exposure","No"] },
+          { id:"socialMediaActive", label:"Do you have an active social media presence?", type:"radio", required:false, options:["Yes","No"] },
+          { id:"socialHandles", label:"If yes, please provide your handles (Instagram, TikTok, X/Twitter, LinkedIn, etc.)", type:"text", required:false },
+          { id:"publicStory", label:"Is there a personal or community story behind your desire to summit that you'd be open to sharing publicly?", type:"textarea", required:false },
+        ]
+      },
+      {
+        title: "Final Declaration",
+        sub: "Section 10",
+        fields: [
+          { id:"confirmTruthful", label:"All information provided is truthful and accurate to the best of my knowledge.", type:"confirm", required:true },
+          { id:"confirmCompetitive", label:"I understand that selection is competitive and that submission does not guarantee placement on the team.", type:"confirm", required:true },
+          { id:"confirmMedical", label:"I am willing to undergo medical clearance, fitness assessments, and training evaluations as required.", type:"confirm", required:true },
+          { id:"confirmDemands", label:"I understand the serious physical and psychological demands of high-altitude mountaineering.", type:"confirm", required:true },
+          { id:"confirmVoluntary", label:"I am entering this process voluntarily and take personal responsibility for my preparation and participation.", type:"confirm", required:true },
+          { id:"printName", label:"Full Name (Print) — acts as your signature", type:"text", required:true },
+          { id:"signDate", label:"Date", type:"date", required:true },
+        ]
+      },
+    ];
+
+    function FieldRenderer({ field, value, onChange, showError }) {
+      const isInvalid = showError && field.required && (() => {
+        if (field.type === "checkbox") return !Array.isArray(value) || value.length === 0;
+        if (field.type === "confirm") return value !== true;
+        if (field.type === "scale") return !value;
+        return !value || !String(value).trim();
+      })();
+
+      const errTag = isInvalid
+        ? <div style={{ fontSize:11, color:"#CC4444", marginTop:5, fontWeight:500, letterSpacing:0.3 }}>This field is required</div>
+        : null;
+
+      const labelEl = (
+        <div style={{ marginBottom:8 }}>
+          <label style={{ fontSize:13, fontWeight:500, color:isInvalid?"#CC4444":TEXT, lineHeight:1.5 }}>
+            {field.label}{field.required && <span style={{ color:isInvalid?"#CC4444":GOLD }}> *</span>}
+          </label>
+          {field.hint && <div style={{ fontSize:11.5, color:MUTED, marginTop:3, fontStyle:"italic" }}>{field.hint}</div>}
+        </div>
+      );
+
+      if (field.type === "text" || field.type === "email" || field.type === "tel" || field.type === "date") {
+        return (
+          <div style={{ marginBottom:20 }}>
+            {labelEl}
+            <input type={field.type} className={`inp${isInvalid?" inp-err":""}`} value={value || ""} onChange={e=>onChange(e.target.value)} />
+            {errTag}
+          </div>
+        );
+      }
+      if (field.type === "textarea") {
+        return (
+          <div style={{ marginBottom:20 }}>
+            {labelEl}
+            <textarea className={`inp${isInvalid?" inp-err":""}`} rows={field.big ? 6 : 3} value={value || ""} onChange={e=>onChange(e.target.value)} style={{ resize:"vertical", lineHeight:1.6 }}/>
+            {errTag}
+          </div>
+        );
+      }
+      if (field.type === "radio") {
+        return (
+          <div style={{ marginBottom:20, padding:isInvalid?"12px":"0", border:isInvalid?"1px solid #FFCCCC":"none", borderRadius:isInvalid?3:0, background:isInvalid?"#FFF8F8":"transparent" }}>
+            {labelEl}
+            <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+              {field.options.map(opt=>(
+                <label key={opt} onClick={()=>onChange(opt)} style={{ display:"flex", alignItems:"center", gap:9, padding:"9px 12px", border:`1px solid ${value===opt?GOLD:BR}`, background:value===opt?`${GOLD}12`:"#fff", borderRadius:3, cursor:"pointer", fontSize:13, color:value===opt?GOLD:TEXTSUB, transition:"all .15s" }}>
+                  <span style={{ width:14, height:14, borderRadius:"50%", border:`1.5px solid ${value===opt?GOLD:DIM}`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    {value===opt && <span style={{ width:7, height:7, borderRadius:"50%", background:GOLD }}/>}
+                  </span>
+                  {opt}
+                </label>
+              ))}
+            </div>
+            {errTag}
+          </div>
+        );
+      }
+      if (field.type === "checkbox") {
+        const arr = Array.isArray(value) ? value : [];
+        const toggle = (opt) => {
+          if (arr.includes(opt)) onChange(arr.filter(o=>o!==opt));
+          else onChange([...arr, opt]);
+        };
+        return (
+          <div style={{ marginBottom:20, padding:isInvalid?"12px":"0", border:isInvalid?"1px solid #FFCCCC":"none", borderRadius:isInvalid?3:0, background:isInvalid?"#FFF8F8":"transparent" }}>
+            {labelEl}
+            <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+              {field.options.map(opt=>{
+                const sel = arr.includes(opt);
+                return (
+                  <label key={opt} onClick={()=>toggle(opt)} style={{ display:"flex", alignItems:"center", gap:7, padding:"7px 12px", border:`1px solid ${sel?GOLD:BR}`, background:sel?`${GOLD}12`:"#fff", borderRadius:3, cursor:"pointer", fontSize:12.5, color:sel?GOLD:TEXTSUB }}>
+                    <span style={{ width:13, height:13, borderRadius:3, border:`1.5px solid ${sel?GOLD:DIM}`, background:sel?GOLD:"transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                      {sel && <svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3.2,6.2 7,1.5" fill="none" stroke="#fff" strokeWidth="1.4"/></svg>}
+                    </span>
+                    {opt}
+                  </label>
+                );
+              })}
+            </div>
+            {errTag}
+          </div>
+        );
+      }
+      if (field.type === "scale") {
+        return (
+          <div style={{ marginBottom:20, padding:isInvalid?"12px":"0", border:isInvalid?"1px solid #FFCCCC":"none", borderRadius:isInvalid?3:0, background:isInvalid?"#FFF8F8":"transparent" }}>
+            {labelEl}
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+              {[1,2,3,4,5,6,7,8,9,10].map(n=>(
+                <button key={n} type="button" onClick={()=>onChange(n)} style={{ width:34, height:34, borderRadius:"50%", border:`1.5px solid ${value===n?GOLD:BR}`, background:value===n?GOLD:"#fff", color:value===n?"#fff":TEXTSUB, fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"'Outfit',sans-serif" }}>{n}</button>
+              ))}
+            </div>
+            {errTag}
+          </div>
+        );
+      }
+      if (field.type === "confirm") {
+        return (
+          <div onClick={()=>onChange(!value)} style={{ display:"flex", gap:10, alignItems:"flex-start", padding:"11px 14px", border:`1px solid ${isInvalid?"#E05555":value?GOLD:BR}`, background:isInvalid&&!value?"#FFF8F8":value?`${GOLD}10`:"#fff", borderRadius:3, cursor:"pointer", marginBottom:12 }}>
+            <span style={{ width:16, height:16, borderRadius:3, border:`1.5px solid ${value?GOLD:isInvalid?"#E05555":DIM}`, background:value?GOLD:"transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1 }}>
+              {value && <svg width="9" height="9" viewBox="0 0 8 8"><polyline points="1,4 3.2,6.2 7,1.5" fill="none" stroke="#fff" strokeWidth="1.6"/></svg>}
+            </span>
+            <span style={{ fontSize:12.5, color:isInvalid&&!value?"#CC4444":TEXT, lineHeight:1.55 }}>{field.label}</span>
+          </div>
+        );
+      }
+      return null;
+    }
+
+    function ApplyModal({ onClose }) {
+      const [step, setStep] = useState(0);
+      const [data, setData] = useState({});
+      const [status, setStatus] = useState("idle"); // idle | sending | success | error
+      const [errMsg, setErrMsg] = useState("");
+      const [touched, setTouched] = useState(false);
+      const scrollRef = useRef(null);
+
+      useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => { document.body.style.overflow = ""; };
+      }, []);
+
+      const total = APPLICATION_STEPS.length;
+      const current = APPLICATION_STEPS[step];
+
+      const setField = (id, val) => setData(d => ({ ...d, [id]: val }));
+
+      const isFieldInvalid = (f, v) => {
+        if (!f.required) return false;
+        if (f.type === "checkbox") return !Array.isArray(v) || v.length === 0;
+        if (f.type === "confirm") return v !== true;
+        if (f.type === "scale") return !v;
+        return !v || !String(v).trim();
+      };
+
+      const stepValid = () => current.fields.every(f => !isFieldInvalid(f, data[f.id]));
+
+      const goNext = () => {
+        setTouched(true);
+        if (!stepValid()) {
+          setTimeout(() => {
+            const firstBad = current.fields.find(f => isFieldInvalid(f, data[f.id]));
+            if (firstBad && scrollRef.current) {
+              const el = scrollRef.current.querySelector(`#field-${firstBad.id}`);
+              if (el) {
+                const containerRect = scrollRef.current.getBoundingClientRect();
+                const elRect = el.getBoundingClientRect();
+                const offset = scrollRef.current.scrollTop + elRect.top - containerRect.top - 20;
+                scrollRef.current.scrollTo({ top: offset, behavior: "smooth" });
+              }
+            }
+          }, 40);
+          return;
+        }
+        setTouched(false);
+        if (scrollRef.current) scrollRef.current.scrollTop = 0;
+        if (step < total - 1) setStep(s=>s+1);
+        else handleSubmit();
+      };
+      const goBack = () => { setTouched(false); if (scrollRef.current) scrollRef.current.scrollTop = 0; setStep(s=>Math.max(0,s-1)); };
+
+      const handleSubmit = async () => {
+        setStatus("sending"); setErrMsg("");
+        try {
+          // Build a readable text body of every answer, grouped by section.
+          let body = "";
+          APPLICATION_STEPS.forEach(sec => {
+            body += `\n\n--- ${sec.title.toUpperCase()} ---\n`;
+            sec.fields.forEach(f => {
+              const v = data[f.id];
+              const display = Array.isArray(v) ? v.join(", ") : (v === true ? "Confirmed" : (v || "—"));
+              body += `${f.label}: ${display}\n`;
+            });
+          });
+
+          const templateParams = {
+            name: data.fullName || "Unknown applicant",
+            title: `Team SA Everest 2027 Application — ${data.fullName || "Unknown applicant"}`,
+            time: new Date().toLocaleString("en-ZA", { timeZone: "Africa/Johannesburg" }),
+            email: data.email || "",
+            message: `Phone: ${data.phone || "—"}` + body,
+          };
+
+          if (window.emailjs && EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
+            await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams, { publicKey: EMAILJS_PUBLIC_KEY });
+          } else {
+            // EmailJS not configured yet — surface this clearly instead of failing silently.
+            throw new Error("EmailJS isn't configured yet (missing public key / service / template IDs).");
+          }
+          setStatus("success");
+        } catch (err) {
+          setStatus("error");
+          setErrMsg(err && err.message ? err.message : "Something went wrong sending your application. Please try again.");
+        }
+      };
+
+      const pct = Math.round(((step + 1) / total) * 100);
+
+      return (
+        <div style={{ position:"fixed", inset:0, background:"rgba(30,26,20,0.55)", display:"flex", alignItems:"flex-start", justifyContent:"center", zIndex:9999, padding:"24px 20px", overflowY:"auto" }}
+>
+          <div className="modal-anim" style={{ background:CARD, border:`1px solid ${BR}`, borderRadius:4, width:"100%", maxWidth:860, padding:"0", position:"relative", boxShadow:"0 8px 40px rgba(0,0,0,0.18)", marginTop:8 }}>
+
+            <button onClick={onClose} style={{ position:"absolute", top:16, right:18, background:"none", border:"none", color:MUTED, cursor:"pointer", fontSize:18, lineHeight:1, padding:4, zIndex:2 }}>{"\u2715"}</button>
+
+            {status === "success" ? (
+              <div style={{ textAlign:"center", padding:"56px 36px" }}>
+                <div className="check-anim" style={{ width:68, height:68, borderRadius:"50%", background:GOLD, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 22px" }}>
+                  <svg width="32" height="32" viewBox="0 0 32 32"><polyline points="6,17 13,24 26,10" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+                <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:30, marginBottom:10, color:TEXT }}>Application received</h3>
+                <p style={{ color:TEXTSUB, fontSize:14, lineHeight:1.65, fontWeight:300 }}>Thank you, {data.fullName ? data.fullName.split(" ")[0] : "climber"}. Your application has been sent to the Team South Africa selection panel. We'll be in touch.</p>
+              </div>
+            ) : (
+              <>
+                <div style={{ padding:"36px 44px 0" }}>
+                  <p className="section-label" style={{ marginBottom:6 }}>{current.sub} · Step {step+1} of {total}</p>
+                  <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:30, color:TEXT, marginBottom:14 }}>{current.title}</h2>
+                  <div style={{ height:3, background:BR, borderRadius:2, overflow:"hidden", marginBottom:24 }}>
+                    <div style={{ height:"100%", width:`${pct}%`, background:`linear-gradient(90deg,${GOLD},${GOLD2})`, transition:"width .3s ease" }}/>
+                  </div>
+                </div>
+
+                <div ref={scrollRef} style={{ padding:"0 44px", maxHeight:"62vh", overflowY:"auto" }}>
+                  {current.fields.map(f => (
+                    <div key={f.id} id={`field-${f.id}`}>
+                      <FieldRenderer field={f} value={data[f.id]} onChange={(v)=>setField(f.id, v)} showError={touched} />
+                    </div>
+                  ))}
+                  {status === "error" && (
+                    <div style={{ background:"#FFF0F0", border:"1px solid #FFCCCC", borderRadius:3, padding:"10px 14px", marginBottom:14, fontSize:12, color:"#CC4444" }}>
+                      {errMsg}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display:"flex", gap:10, padding:"20px 44px 32px", borderTop:`1px solid ${BR}`, marginTop:16 }}>
+                  {step > 0 && (
+                    <button className="btn-outline" style={{ padding:"13px 20px", borderRadius:3, flex:"0 0 auto" }} onClick={goBack}>BACK</button>
+                  )}
+                  <button className="btn-gold" style={{ padding:"13px 20px", borderRadius:3, flex:1, opacity: status==="sending" ? 0.6 : 1, cursor: status==="sending" ? "not-allowed" : "pointer" }} disabled={status==="sending"} onClick={goNext}>
+                    {status==="sending" ? "SENDING\u2026" : (step < total - 1 ? "CONTINUE \u2192" : "SUBMIT APPLICATION \u2192")}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
 
     function MountainTracker({ blink, isMobile }) {
       const routePoints = [
@@ -170,6 +573,7 @@
     function App() {
       const [blink,      setBlink]      = useState(true);
       const [showPay,    setShowPay]    = useState(false);
+      const [showApply,  setShowApply]  = useState(false);
       const [selAmt,     setSelAmt]     = useState(800);
       const [donated,    setDonated]    = useState(false);
       const [monthly,    setMonthly]    = useState(false);
@@ -195,6 +599,11 @@
         }
         return ()=>{ clearInterval(t); window.removeEventListener("resize", handleResize); };
       },[]);
+
+      useEffect(()=>{
+        document.body.style.overflow = showPay ? "hidden" : "";
+        return ()=>{ document.body.style.overflow = ""; };
+      },[showPay]);
 
       const raised  = 248460;
       const goal    = 350000;
@@ -245,7 +654,7 @@
         <div style={{ background:BG, color:TEXT, fontFamily:"'Outfit', sans-serif", minHeight:"100vh" }}>
           <style>{`
             *{box-sizing:border-box;margin:0;padding:0}
-            input,button{font-family:inherit}
+            input,button,textarea{font-family:inherit}
             ::selection{background:${GOLD}30}
             .btn-gold{background:${GOLD};color:#fff;border:none;cursor:pointer;font-weight:600;letter-spacing:2px;font-size:11px;transition:background .2s,transform .1s}
             .btn-gold:hover{background:${GOLD2}}
@@ -258,6 +667,7 @@
             .inp{background:#fff;border:1px solid ${BR};color:${TEXT};padding:12px 14px;border-radius:3px;width:100%;font-size:13px;outline:none;transition:border-color .15s;font-family:'Outfit',sans-serif}
             .inp:focus{border-color:${GOLD}}
             .inp::placeholder{color:${DIM}}
+            .inp-err{border-color:#E05555 !important;background:#FFF8F8 !important}
             .log-card{background:${CARD};border:1px solid ${BR};border-radius:4px;overflow:hidden;transition:border-color .2s;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
             .log-card:hover{border-color:#D4CDBF}
             .section-label{font-weight:500;font-size:10px;letter-spacing:4px;color:${GOLD};text-transform:uppercase;margin-bottom:14px}
@@ -277,10 +687,51 @@
               <em style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontWeight:300, fontSize:17, color:GOLD }}>with Zuko</em>
             </a>
             <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-              {!isMobile && <button className="btn-outline" style={{ padding:"7px 18px", borderRadius:3 }}>FEED</button>}
-              <button className="btn-gold" style={{ padding:"7px 20px", borderRadius:3 }} onClick={()=>setShowPay(true)}>DONATE</button>
+              <button className="btn-gold" style={{ padding:"7px 20px", borderRadius:3 }} onClick={()=>setShowApply(true)}>APPLY TO TEAM SA</button>
+              <button className="btn-outline" style={{ padding:"7px 18px", borderRadius:3 }} onClick={()=>setShowPay(true)}>DONATE</button>
             </div>
           </header>
+
+          {/* TEAM SA APPLICATION CTA */}
+          <section style={{ borderBottom:`1px solid ${BR}`, background:"linear-gradient(138deg,#F5EFE4 0%,#FAF6EF 50%,#F2EBE0 100%)", padding:`${isMobile?"48px":"72px"} ${px}` }}>
+            <div style={{ maxWidth:960, margin:"0 auto" }}>
+              <div style={{ borderLeft:`3px solid ${GOLD}`, paddingLeft:20, marginBottom:isMobile?32:40 }}>
+                <p className="section-label">Team South Africa · Everest 2027</p>
+                <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:`clamp(${isMobile?"32px":"40px"},4.5vw,60px)`, lineHeight:1.06, letterSpacing:-0.5, color:TEXT }}>
+                  Applications are&nbsp;<em style={{ fontStyle:"italic", color:GOLD }}>open.</em><br/>
+                  {!isMobile && "Are you on the team?"}
+                </h2>
+                {isMobile && <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:"clamp(32px,8vw,48px)", lineHeight:1.06, letterSpacing:-0.5, color:TEXT }}>Are you on the team?</h2>}
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:isMobile?32:56, alignItems:"start" }}>
+                <div>
+                  <p style={{ color:TEXTSUB, fontSize:14, lineHeight:1.8, fontWeight:300, marginBottom:28, maxWidth:400 }}>
+                    Summit with Zuko is building the South Africa team for the 2027 Everest expedition. Selection is competitive — submit your application and let the mountain decide.
+                  </p>
+                  <p style={{ color:MUTED, fontSize:12, lineHeight:1.7, fontWeight:300, marginBottom:32, maxWidth:400 }}>
+                    The application covers 11 sections: personal background, physical fitness, altitude experience, mental resilience, health, logistics, and more. Take your time — the answers matter.
+                  </p>
+                  <button className="btn-gold" style={{ padding:"15px 32px", borderRadius:3, fontSize:11, letterSpacing:2 }} onClick={()=>setShowApply(true)}>
+                    APPLY NOW →
+                  </button>
+                  <p style={{ marginTop:14, fontSize:10, color:MUTED, letterSpacing:2, fontWeight:500 }}>EXPEDITION WINDOW · APRIL – JUNE 2027</p>
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:0, border:`1px solid #E0D8C8`, borderRadius:4, overflow:"hidden", background:"#fff" }}>
+                  {[
+                    { num:"11",      label:"Application sections" },
+                    { num:"8,849m",  label:"Summit elevation" },
+                    { num:"Apr–Jun", label:"Expedition window" },
+                    { num:"2027",    label:"Target year" },
+                  ].map((s,i) => (
+                    <div key={i} style={{ padding:isMobile?"20px 18px":"28px 24px", borderRight:i%2===0?`1px solid #E0D8C8`:"none", borderBottom:i<2?`1px solid #E0D8C8`:"none" }}>
+                      <div style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:isMobile?30:40, letterSpacing:-0.5, color:TEXT, lineHeight:1, marginBottom:6 }}>{s.num}</div>
+                      <div style={{ fontSize:9, fontWeight:500, letterSpacing:3, color:MUTED, textTransform:"uppercase" }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
 
           {/* HERO */}
           <section style={{ padding:`${isMobile?"32px":"56px"} ${px} 38px`, maxWidth:960, margin:"0 auto" }}>
@@ -446,10 +897,13 @@
             </div>
           )}
 
+          {/* APPLICATION MODAL */}
+          {showApply && <ApplyModal onClose={()=>setShowApply(false)} />}
+
           {/* PAYMENT MODAL */}
           {showPay&&(
             <div style={{ position:"fixed", inset:0, background:"rgba(30,26,20,0.5)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:9999, padding:20 }}
-              onClick={ev=>ev.target===ev.currentTarget&&setShowPay(false)}>
+>
               <div className="modal-anim" style={{ background:CARD, border:`1px solid ${BR}`, borderRadius:4, width:"100%", maxWidth:460, padding:isMobile?"28px 24px":"36px 38px", position:"relative", maxHeight:"92vh", overflowY:"auto", boxShadow:"0 8px 40px rgba(0,0,0,0.15)" }}>
                 <button onClick={()=>{ setShowPay(false); setPayStatus("idle"); setPayMsg(""); }} style={{ position:"absolute", top:16, right:18, background:"none", border:"none", color:MUTED, cursor:"pointer", fontSize:18, lineHeight:1, padding:4 }}>{"\u2715"}</button>
                 {payStatus==="success"?(
